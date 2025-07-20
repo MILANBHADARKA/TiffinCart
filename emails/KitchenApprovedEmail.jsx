@@ -37,7 +37,6 @@ export default function KitchenApprovedEmail({ ownerName, kitchenName, kitchenId
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
           }}
         >
-          {/* Header */}
           <div
             style={{
               background: 'linear-gradient(135deg, #22c55e, #16a34a)',
@@ -57,7 +56,6 @@ export default function KitchenApprovedEmail({ ownerName, kitchenName, kitchenId
             </Heading>
           </div>
 
-          {/* Content */}
           <div style={{ padding: '40px 20px' }}>
             <Row>
               <Heading
@@ -97,7 +95,6 @@ export default function KitchenApprovedEmail({ ownerName, kitchenName, kitchenId
               </Text>
             </Row>
 
-            {/* Footer */}
             <Text
               style={{
                 color: '#6b7280',

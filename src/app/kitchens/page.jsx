@@ -73,7 +73,6 @@ function KitchensPage() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Kitchens Near You 🏪
@@ -83,7 +82,6 @@ function KitchensPage() {
           </p>
         </div>
 
-        {/* Search and Filters */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
@@ -117,7 +115,6 @@ function KitchensPage() {
           </div>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -129,7 +126,6 @@ function KitchensPage() {
           </div>
         )}
 
-        {/* Kitchens Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredKitchens.map((kitchen) => (
             <Link
@@ -139,12 +135,10 @@ function KitchensPage() {
                 theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
               }`}
             >
-              {/* Kitchen Image */}
               <div className="h-48 bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center">
                 <span className="text-6xl">👨‍🍳</span>
               </div>
 
-              {/* Kitchen Details */}
               <div className="p-6">
                 <div className="flex items-start justify-between mb-2">
                   <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>

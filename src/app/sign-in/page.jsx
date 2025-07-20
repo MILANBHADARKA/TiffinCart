@@ -57,7 +57,6 @@ function SignInPage() {
         : 'bg-gradient-to-br from-orange-50 via-white to-yellow-50'
     }`}>
       <div className="max-w-sm sm:max-w-md w-full space-y-6 sm:space-y-8">
-        {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <Link href="/" className="text-sm text-orange-600 hover:text-orange-500 flex items-center">
@@ -94,14 +93,12 @@ function SignInPage() {
           </p>
         </div>
 
-        {/* Form */}
         <div className={`rounded-xl shadow-lg p-6 sm:p-8 border transition-colors ${
           theme === 'dark' 
             ? 'bg-gray-800 border-gray-700' 
             : 'bg-white border-gray-100'
         }`}>
           <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -133,7 +130,6 @@ function SignInPage() {
               )}
             </div>
 
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -165,7 +161,6 @@ function SignInPage() {
               )}
             </div>
 
-            {/* Remember Me & Forgot Password */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
               <div className="flex items-center">
                 <input
@@ -185,7 +180,6 @@ function SignInPage() {
               </Link>
             </div>
 
-            {/* Message */}
             {message && (
               <div className={`p-3 sm:p-4 rounded-lg border ${
                 messageType === 'success' 
@@ -207,7 +201,6 @@ function SignInPage() {
               </div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -226,8 +219,7 @@ function SignInPage() {
               )}
             </button>
           </form>
-
-          {/* Divider */}
+ 
           <div className="mt-4 sm:mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -240,8 +232,7 @@ function SignInPage() {
               </div>
             </div>
           </div>
-
-          {/* Quick Access Cards */}
+ 
           <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-3 sm:gap-4">
             <div className={`p-3 sm:p-4 rounded-lg border ${
               theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-orange-50 border-orange-200'
@@ -261,8 +252,7 @@ function SignInPage() {
             </div>
           </div>
         </div>
-
-        {/* Footer */}
+ 
         <div className={`text-center text-xs sm:text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
           Secure login with industry-standard encryption
         </div>

@@ -47,7 +47,6 @@ export async function GET(req, { params }) {
             }), { status: 400 });
         }
 
-        // Find Kitchen
         const kitchen = await Kitchen.findById(id);
         if (!kitchen) {
             return new Response(JSON.stringify({
@@ -110,7 +109,6 @@ export async function PUT(req, { params }) {
             }), { status: 400 });
         }
 
-        // Find and kitchen
         const kitchen = await Kitchen.findById(id);
 
         if (!kitchen) {
@@ -136,7 +134,6 @@ export async function PUT(req, { params }) {
 
         const body = await req.json();
 
-        //update value that are provided otherwise keep the existing values
 
         const updatedData = {
             name: body.name || kitchen.name,
@@ -151,7 +148,6 @@ export async function PUT(req, { params }) {
                 phone: body.contact?.phone || kitchen.contact.phone,
                 email: body.contact?.email || kitchen.contact.email
             },
-            // add isCurrentlyOpen boolean field (coming as string from frontend)
             isCurrentlyOpen: body.isCurrentlyOpen === 'True'
         };
 
@@ -169,7 +165,6 @@ export async function PUT(req, { params }) {
             updatedData.pictures = uploadedPictures;
         }
 
-        // Update Kitchen
         const updatedKitchen = await Kitchen.findByIdAndUpdate(id, updatedData, { new: true });
 
         if (!updatedKitchen) {

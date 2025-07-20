@@ -45,7 +45,7 @@ const tempUserSchema = new Schema({
     timestamps: true
 });
 
-// Auto-delete expired temp users
+// Auto-delete
 tempUserSchema.index({ verifyCodeExpires: 1 }, { expireAfterSeconds: 0 });
 
 const TempUser = mongoose.models.TempUser || mongoose.model('TempUser', tempUserSchema);

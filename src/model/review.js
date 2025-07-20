@@ -47,7 +47,7 @@ const reviewSchema = new mongoose.Schema({
         enum: ['taste', 'quality', 'packaging', 'delivery', 'value', 'freshness', 'quantity', 'service']
     }],
     images: [{
-        type: String // URLs to review images
+        type: String
     }],
     isVerifiedPurchase: {
         type: Boolean,
@@ -69,7 +69,7 @@ const reviewSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Indexes for better query performance
+// for better query performance
 reviewSchema.index({ sellerId: 1, type: 1, createdAt: -1 });
 reviewSchema.index({ menuItemId: 1, rating: -1 });
 reviewSchema.index({ customerId: 1, createdAt: -1 });

@@ -47,7 +47,7 @@ const menuItemSchema = new mongoose.Schema({
         default: 'medium'
     },
     preparationTime: {
-        type: Number, // in minutes
+        type: Number,
         required: true,
         min: 5
     },
@@ -65,7 +65,7 @@ const menuItemSchema = new mongoose.Schema({
         fiber: Number
     },
     images: [{
-        type: String // URLs to images
+        type: String
     }],
     isAvailable: {
         type: Boolean,

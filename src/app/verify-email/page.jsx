@@ -115,7 +115,6 @@ function VerifyEmailPage() {
         : 'bg-gradient-to-br from-orange-50 via-white to-yellow-50'
     }`}>
       <div className="max-w-md w-full space-y-8">
-        {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-between mb-6">
             <Link href="/sign-up" className="text-sm text-orange-600 hover:text-orange-500 flex items-center">
@@ -162,14 +161,12 @@ function VerifyEmailPage() {
           </div>
         </div>
 
-        {/* Form */}
         <div className={`rounded-xl shadow-lg p-8 border transition-colors ${
           theme === 'dark' 
             ? 'bg-gray-800 border-gray-700' 
             : 'bg-white border-gray-100'
         }`}>
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -202,7 +199,6 @@ function VerifyEmailPage() {
               )}
             </div>
 
-            {/* Verification Code Field */}
             <div>
               <label htmlFor="verifyCode" className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -223,7 +219,6 @@ function VerifyEmailPage() {
                         : 'border-gray-300 bg-white text-gray-900'
                   }`}
                   placeholder="000000"
-                  // suggesition stop
                   autoComplete="one-time-code"
                   {...register('verifyCode', { required: 'Verification code is required' })}
                 />
@@ -241,7 +236,6 @@ function VerifyEmailPage() {
               </p>
             </div>
 
-            {/* Message */}
             {message && (
               <div className={`p-4 rounded-lg border ${
                 messageType === 'success' 
@@ -263,7 +257,6 @@ function VerifyEmailPage() {
               </div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -282,7 +275,6 @@ function VerifyEmailPage() {
               )}
             </button>
 
-            {/* Resend Code Button */}
             <button
               type="button"
               onClick={() => handleResendCode(document.getElementById('email').value)}
@@ -308,7 +300,6 @@ function VerifyEmailPage() {
           </form>
         </div>
 
-        {/* Footer */}
         <div className={`text-center space-y-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
           <p className="text-xs">
             Having trouble? Contact our support team

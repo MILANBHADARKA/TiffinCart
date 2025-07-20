@@ -101,7 +101,6 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Get menu item details
         const menuItem = await MenuItem.findById(menuItemId).populate('sellerId', 'name');
         if (!menuItem || !menuItem.isAvailable) {
             return new Response(JSON.stringify({ 
@@ -110,13 +109,11 @@ export async function POST(request) {
             }), { status: 404 });
         }
 
-        // Get or create cart
         let cart = await Cart.findOne({ customerId: user._id });
         if (!cart) {
             cart = new Cart({ customerId: user._id, items: [] });
         }
 
-        // Check if different seller items exist (prevent mixing sellers)
         if (cart.items.length > 0) {
             const existingSellerId = cart.items[0].sellerId.toString();
             if (existingSellerId !== menuItem.sellerId._id.toString()) {
@@ -127,16 +124,13 @@ export async function POST(request) {
             }
         }
 
-        // Check if item already exists in cart
         const existingItemIndex = cart.items.findIndex(
             item => item.menuItemId.toString() === menuItemId
         );
 
         if (existingItemIndex > -1) {
-            // Update quantity
             cart.items[existingItemIndex].quantity += quantity;
         } else {
-            // Add new item
             cart.items.push({
                 menuItemId: menuItem._id,
                 sellerId: menuItem.sellerId._id,
@@ -149,7 +143,6 @@ export async function POST(request) {
 
         await cart.save();
 
-        // Populate cart data for response
         await cart.populate('items.menuItemId', 'name description category isAvailable');
         await cart.populate('items.sellerId', 'name email');
 
@@ -227,10 +220,8 @@ export async function PUT(request) {
         }
 
         if (quantity === 0) {
-            // Remove item from cart
             cart.items.splice(itemIndex, 1);
         } else {
-            // Update item
             cart.items[itemIndex].quantity = quantity;
             if (specialInstructions !== undefined) {
                 cart.items[itemIndex].specialInstructions = specialInstructions;
@@ -239,7 +230,6 @@ export async function PUT(request) {
 
         await cart.save();
 
-        // Populate cart data for response
         await cart.populate('items.menuItemId', 'name description category isAvailable');
         await cart.populate('items.sellerId', 'name email');
 
@@ -300,10 +290,8 @@ export async function DELETE(request) {
         }
 
         if (itemId) {
-            // Remove specific item
             cart.items = cart.items.filter(item => item.menuItemId.toString() !== itemId);
         } else {
-            // Clear entire cart
             cart.items = [];
         }
 

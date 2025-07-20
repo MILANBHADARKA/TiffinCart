@@ -237,7 +237,6 @@ function KitchenMenu() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Kitchen Header */}
         <div className={`rounded-lg border p-6 mb-8 ${
           theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>
@@ -289,9 +288,7 @@ function KitchenMenu() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Menu Items */}
           <div className="lg:col-span-3">
-            {/* Category Filter */}
             <div className="mb-6">
               <div className="flex flex-wrap gap-2">
                 {categories.map(category => (
@@ -312,7 +309,6 @@ function KitchenMenu() {
               </div>
             </div>
 
-            {/* Menu Items Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredItems.map((item) => {
                 const quantityInCart = getItemQuantityInCart(item._id);
@@ -417,7 +413,6 @@ function KitchenMenu() {
               })}
             </div>
 
-            {/* Reviews Section */}
             {reviews.length > 0 && (
               <div className={`mt-12 p-6 rounded-lg border ${
                 theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -484,7 +479,6 @@ function KitchenMenu() {
             )}
           </div>
 
-          {/* Cart Sidebar */}
           <div className="lg:col-span-1">
             <div className={`rounded-lg border p-6 sticky top-8 ${
               theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'

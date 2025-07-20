@@ -42,7 +42,6 @@ function Footer() {
     } border-t`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {/* Brand Section */}
           <div className="space-y-3 sm:space-y-4 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
@@ -62,7 +61,6 @@ function Footer() {
               Fresh ingredients, traditional recipes, delivered with love.
             </p>
             
-            {/* Social Media */}
             <div className="flex space-x-3 sm:space-x-4">
               <a href="#" className="social-icon">
                 <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -87,7 +85,6 @@ function Footer() {
             </div>
           </div>
 
-          {/* Role-based Links */}
           {isAuthenticated && user ? (
             user.role === 'customer' ? <CustomerLinks /> : <SellerLinks />
           ) : (
@@ -97,7 +94,6 @@ function Footer() {
             </>
           )}
 
-          {/* Company Links */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Company</h3>
             <ul className="space-y-1 sm:space-y-2">
@@ -109,7 +105,6 @@ function Footer() {
             </ul>
           </div>
 
-          {/* Legal & Support */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Support & Legal</h3>
             <ul className="space-y-1 sm:space-y-2">
@@ -122,7 +117,6 @@ function Footer() {
           </div>
         </div>
 
-        {/* Bottom Section */}
         <div className={`mt-6 sm:mt-8 pt-6 sm:pt-8 border-t ${
           theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
         }`}>
@@ -131,7 +125,6 @@ function Footer() {
               © 2025 TifinCart. All rights reserved. Made with ❤️ for food lovers.
             </div>
             
-            {/* App Download */}
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
               <a href="#" className="app-download-btn">
                 <div className="flex items-center space-x-2">

@@ -41,7 +41,6 @@ export async function GET(request) {
         const menuItemId = searchParams.get('menuItemId');
         const type = searchParams.get('type');
 
-        // Build filter
         const filter = {};
         if (sellerId) filter.sellerId = sellerId;
         if (menuItemId) filter.menuItemId = menuItemId;
@@ -112,7 +111,6 @@ export async function POST(request) {
             tags 
         } = requestBody;
 
-        // Enhanced validation with detailed error messages
         if (!orderId) {
             console.log('Missing orderId in request');
             return new Response(JSON.stringify({ 
@@ -129,7 +127,6 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Validate sellerId format (MongoDB ObjectId)
         if (!sellerId.match(/^[0-9a-fA-F]{24}$/)) {
             console.log('Invalid sellerId format:', sellerId);
             return new Response(JSON.stringify({ 
@@ -166,7 +163,6 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // For item reviews, menuItemId is required
         if (type === 'item' && !menuItemId) {
             return new Response(JSON.stringify({ 
                 success: false, 
@@ -174,7 +170,6 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Verify order belongs to customer and is delivered
         console.log('Looking for order with:', { _id: orderId, customerId: user._id, sellerId: sellerId });
         
         const order = await Order.findOne({ 
@@ -187,7 +182,6 @@ export async function POST(request) {
         if (!order) {
             console.log('Order not found with criteria:', { orderId, customerId: user._id, sellerId, status: 'delivered' });
             
-            // Try to find the order without seller validation to provide better error message
             const orderExists = await Order.findOne({ _id: orderId, customerId: user._id });
             
             if (!orderExists) {
@@ -208,7 +202,6 @@ export async function POST(request) {
             }
         }
 
-        // Check if review already exists
         const existingReviewFilter = {
             customerId: user._id,
             orderId: orderId,
@@ -216,7 +209,6 @@ export async function POST(request) {
             type: type
         };
 
-        // Add menuItemId to filter for item reviews
         if (type === 'item') {
             existingReviewFilter.menuItemId = menuItemId;
         } else {
@@ -232,7 +224,6 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Create review
         const reviewData = {
             customerId: user._id,
             orderId: orderId,
@@ -245,7 +236,6 @@ export async function POST(request) {
             isVerifiedPurchase: true
         };
 
-        // Add menuItemId for item reviews
         if (type === 'item') {
             reviewData.menuItemId = menuItemId;
         }
@@ -255,10 +245,8 @@ export async function POST(request) {
         const review = new Review(reviewData);
         await review.save();
 
-        // Update average ratings
         await updateAverageRatings(sellerId, menuItemId, type);
 
-        // Populate review for response
         await review.populate('customerId', 'name');
         await review.populate('sellerId', 'name');
         if (menuItemId) {
@@ -285,7 +273,6 @@ export async function POST(request) {
 async function updateAverageRatings(sellerId, menuItemId, type) {
     try {
         if (type === 'kitchen') {
-            // Update seller's average rating
             const ratings = await Review.aggregate([
                 { $match: { sellerId: sellerId, type: 'kitchen' } },
                 { 
@@ -306,7 +293,6 @@ async function updateAverageRatings(sellerId, menuItemId, type) {
         }
 
         if (type === 'item' && menuItemId) {
-            // Update menu item's average rating
             const ratings = await Review.aggregate([
                 { $match: { menuItemId: menuItemId, type: 'item' } },
                 { 

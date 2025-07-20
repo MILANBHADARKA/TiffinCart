@@ -72,7 +72,6 @@ function Header() {
       } backdrop-blur-sm border-b`}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
             <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
               <svg className="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +84,6 @@ function Header() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {isAuthenticated && user && (
               <>
@@ -94,9 +92,7 @@ function Header() {
             )}
           </nav>
 
-          {/* Desktop Right Side Items */}
           <div className="hidden lg:flex items-center space-x-4">
-            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-lg transition-colors ${theme === 'dark'
@@ -107,14 +103,12 @@ function Header() {
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
 
-            {/* User Authentication - Desktop Only */}
             {isLoading ? (
               <div className="animate-pulse">
                 <div className={`h-8 w-20 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
               </div>
             ) : isAuthenticated && user ? (
               <div className="flex items-center space-x-4">
-                {/* User Profile */}
                 <div className="flex items-center space-x-2">
                   <div className="h-8 w-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
@@ -134,7 +128,6 @@ function Header() {
                   </div>
                 </div>
 
-                {/* Logout Button */}
                 <button
                   onClick={handleLogout}
                   className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
@@ -163,9 +156,7 @@ function Header() {
             )}
           </div>
 
-          {/* Mobile Right Side Items */}
           <div className="flex lg:hidden items-center space-x-2">
-            {/* Theme Toggle - Mobile */}
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-lg transition-colors ${theme === 'dark'
@@ -176,7 +167,6 @@ function Header() {
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`p-2 rounded-lg transition-colors ${theme === 'dark'
@@ -195,13 +185,11 @@ function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className={`lg:hidden border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-900/95' : 'border-gray-200 bg-white/95'
             } backdrop-blur-sm`}>
             <div className="px-4 py-6 space-y-6">
 
-              {/* User Profile Section - Mobile */}
               {isLoading ? (
                 <div className="flex items-center space-x-3 animate-pulse">
                   <div className={`h-12 w-12 rounded-full ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}></div>
@@ -260,7 +248,6 @@ function Header() {
                 </div>
               )}
 
-              {/* Navigation Links - Mobile */}
               {isAuthenticated && user && (
                 <div className="space-y-1">
                   <h4 className={`text-sm font-semibold mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -358,7 +345,6 @@ function Header() {
                 </div>
               )}
 
-              {/* Action Buttons - Mobile */}
               {isAuthenticated && user && (
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
                   <Link

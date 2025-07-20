@@ -203,7 +203,6 @@ function SellerMenu() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -221,7 +220,6 @@ function SellerMenu() {
           </button>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -233,7 +231,6 @@ function SellerMenu() {
           </div>
         )}
 
-        {/* Add/Edit Form Modal */}
         {showAddForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className={`max-w-md w-full rounded-lg shadow-lg max-h-screen overflow-y-auto ${
@@ -446,7 +443,6 @@ function SellerMenu() {
           </div>
         )}
 
-        {/* Menu Items Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {menuItems.map((item) => (
             <div
@@ -455,7 +451,6 @@ function SellerMenu() {
                 theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
               }`}
             >
-              {/* Item Image */}
               <div className="h-48 bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center">
                 <span className="text-6xl">
                   {item.category === 'main_course' ? '🍽️' : 
@@ -464,7 +459,6 @@ function SellerMenu() {
                 </span>
               </div>
 
-              {/* Item Details */}
               <div className="p-6">
                 <div className="flex items-start justify-between mb-2">
                   <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -511,7 +505,6 @@ function SellerMenu() {
                   <span>Spice: {item.spiceLevel}</span>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleEdit(item)}

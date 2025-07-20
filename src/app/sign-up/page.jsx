@@ -79,7 +79,6 @@ function SignUpPage() {
         : 'bg-gradient-to-br from-orange-50 via-white to-yellow-50'
     }`}>
       <div className="max-w-md w-full space-y-8">
-        {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-between mb-6">
             <Link href="/" className="text-sm text-orange-600 hover:text-orange-500 flex items-center">
@@ -116,14 +115,12 @@ function SignUpPage() {
           </p>
         </div>
 
-        {/* Form */}
         <div className={`rounded-xl shadow-lg p-8 border transition-colors ${
           theme === 'dark' 
             ? 'bg-gray-800 border-gray-700' 
             : 'bg-white border-gray-100'
         }`}>
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Name Field */}
             <div>
               <label htmlFor="name" className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -148,7 +145,6 @@ function SignUpPage() {
               )}
             </div>
 
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -173,7 +169,6 @@ function SignUpPage() {
               )}
             </div>
 
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -202,7 +197,6 @@ function SignUpPage() {
               </p>
             </div>
 
-            {/* Role Selection */}
             <div>
               <label className={`block text-sm font-medium mb-2 ${
                 theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -263,7 +257,6 @@ function SignUpPage() {
               )}
             </div>
 
-            {/* Message */}
             {message && (
               <div className={`p-4 rounded-lg border ${
                 messageType === 'success'
@@ -285,7 +278,6 @@ function SignUpPage() {
               </div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -305,7 +297,6 @@ function SignUpPage() {
             </button>
           </form>
 
-          {/* Quick Info Cards */}
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -339,7 +330,6 @@ function SignUpPage() {
           </div>
         </div>
 
-        {/* Footer */}
         <div className={`text-center text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
           By signing up, you agree to our{' '}
           <Link href="/terms" className="text-orange-600 hover:text-orange-500">

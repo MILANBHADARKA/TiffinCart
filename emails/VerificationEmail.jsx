@@ -37,7 +37,6 @@ export default function VerificationEmail({ name, verifyCode }) {
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
           }}
         >
-          {/* Header */}
           <div
             style={{
               background: 'linear-gradient(135deg, #22c55e, #16a34a)',
@@ -78,7 +77,6 @@ export default function VerificationEmail({ name, verifyCode }) {
             </Heading>
           </div>
 
-          {/* Content */}
           <div style={{ padding: '40px 20px' }}>
             <Row>
               <Heading
@@ -149,7 +147,6 @@ export default function VerificationEmail({ name, verifyCode }) {
               </Text>
             </Row>
 
-            {/* Security Notice */}
             <div
               style={{
                 backgroundColor: '#fef3c7',
@@ -172,7 +169,6 @@ export default function VerificationEmail({ name, verifyCode }) {
             </div>
           </div>
 
-          {/* Footer */}
           <div
             style={{
               backgroundColor: '#f8fafc',

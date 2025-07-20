@@ -130,7 +130,6 @@ function SellerDashboard() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Welcome back, {user?.name}! 👨‍🍳
@@ -140,7 +139,6 @@ function SellerDashboard() {
           </p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -152,7 +150,6 @@ function SellerDashboard() {
           </div>
         )}
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Kitchens"
@@ -185,7 +182,6 @@ function SellerDashboard() {
           />
         </div>
 
-        {/* Quick Actions */}
         {dashboardData.totalKitchens === 0 ? (
           <div className={`p-8 rounded-lg border-2 border-dashed mb-8 text-center ${
             theme === 'dark' ? 'border-gray-600 bg-gray-800' : 'border-gray-300 bg-gray-50'
@@ -252,9 +248,7 @@ function SellerDashboard() {
           </div>
         )}
 
-        {/* Recent Activity Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Recent Orders */}
           <div className={`p-6 rounded-lg border ${
             theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
           }`}>
@@ -321,7 +315,6 @@ function SellerDashboard() {
             </div>
           </div>
 
-          {/* Kitchen Performance */}
           <div className={`p-6 rounded-lg border ${
             theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
           }`}>
@@ -373,7 +366,6 @@ function SellerDashboard() {
           </div>
         </div>
 
-        {/* Order Status Overview */}
         <div className={`p-6 rounded-lg border ${
           theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>

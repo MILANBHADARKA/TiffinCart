@@ -154,7 +154,6 @@ function CartPage() {
       const result = await response.json();
 
       if (result.success) {
-        // Clear cart after successful order
         await clearCart();
         alert('Order placed successfully!');
         router.push('/orders');
@@ -187,7 +186,6 @@ function CartPage() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -208,7 +206,6 @@ function CartPage() {
           )}
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -221,7 +218,6 @@ function CartPage() {
         )}
 
         {cart?.items?.length === 0 ? (
-          /* Empty Cart */
           <div className={`text-center py-12 ${
             theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
           }`}>
@@ -237,7 +233,6 @@ function CartPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cart?.items?.map((item) => (
                 <div
@@ -316,7 +311,6 @@ function CartPage() {
               ))}
             </div>
 
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className={`rounded-lg border p-6 sticky top-8 ${
                 theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'

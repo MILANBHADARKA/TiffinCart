@@ -121,7 +121,6 @@ function CustomerDashboard() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Welcome back, {user?.name}! 🍽️
@@ -131,7 +130,6 @@ function CustomerDashboard() {
           </p>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Orders"
@@ -163,7 +161,6 @@ function CustomerDashboard() {
           />
         </div>
 
-        {/* Quick Actions */}
         <div className={`p-6 rounded-lg border mb-8 ${
           theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>
@@ -211,7 +208,6 @@ function CustomerDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Orders */}
           <div className={`p-6 rounded-lg border ${
             theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
           }`}>
@@ -273,7 +269,6 @@ function CustomerDashboard() {
             </div>
           </div>
 
-          {/* Nearby Kitchens */}
           <div className={`p-6 rounded-lg border ${
             theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
           }`}>
@@ -339,7 +334,6 @@ function CustomerDashboard() {
           </div>
         </div>
 
-        {/* Special Offers */}
         <div className={`mt-8 p-6 rounded-lg border ${
           theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>

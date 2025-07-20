@@ -146,7 +146,6 @@ function SellerOrders() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Order Management 📋
@@ -156,7 +155,6 @@ function SellerOrders() {
           </p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -168,7 +166,6 @@ function SellerOrders() {
           </div>
         )}
 
-        {/* Status Tabs */}
         <div className={`mb-6 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
           <nav className="-mb-px flex space-x-8">
             {[{
@@ -197,7 +194,6 @@ function SellerOrders() {
           </nav>
         </div>
 
-        {/* Orders List */}
         <div className="space-y-6">
           {orders.map((order) => (
             <div
@@ -207,7 +203,6 @@ function SellerOrders() {
               }`}
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                {/* Order Info */}
                 <div className="flex-1">
                   <div className="flex items-center space-x-4 mb-3">
                     <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -240,7 +235,6 @@ function SellerOrders() {
                     </div>
                   </div>
 
-                  {/* Order Items */}
                   <div className="mt-4">
                     <h4 className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                       Items:
@@ -266,7 +260,6 @@ function SellerOrders() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex flex-col space-y-2 lg:ml-6">
                   {getActionButton(order)}
                   {order.status !== 'cancelled' && order.status !== 'delivered' && (

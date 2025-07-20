@@ -16,7 +16,6 @@ export async function POST(request) {
             role
         } = await request.json();
 
-        // Validate required fields
         if (!name || !email || !password || !role) {
             return new Response(JSON.stringify({ success: false, error: "All fields are required" }), { status: 400 });
         }

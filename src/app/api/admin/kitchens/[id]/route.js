@@ -2,10 +2,13 @@ import dbConnect from "@/lib/dbConnect";
 import User from "@/model/user";
 import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
-import { sendKitchenApprovalEmail } from "@/helper/sendAdminNotification";
 import { cookies } from 'next/headers';
+import { Resend } from 'resend';
+import { notifyKitchenOwner } from "@/helper/notifyKitchenOwner";
 
-export async function GET() {
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function GET(request, { params }) {
     try {
         await dbConnect();
 
@@ -28,24 +31,30 @@ export async function GET() {
         }
 
         const user = await User.findById(decoded.id);
-        if (!user || user.role !== 'seller') {
+        if (!user || user.role !== 'admin') {
             return new Response(JSON.stringify({ 
                 success: false, 
                 error: "Unauthorized access" 
             }), { status: 403 });
         }
 
-        const kitchens = await Kitchen.find({ 
-            ownerId: user._id 
-        }).sort({ createdAt: -1 }).lean();
+        const kitchenId = params.id;
+        const kitchen = await Kitchen.findById(kitchenId).populate('ownerId', 'name email');
+
+        if (!kitchen) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Kitchen not found" 
+            }), { status: 404 });
+        }
 
         return new Response(JSON.stringify({ 
             success: true, 
-            data: { kitchens }
+            data: { kitchen }
         }), { status: 200 });
 
     } catch (error) {
-        console.error("Error in kitchens GET route:", error);
+        console.error("Error in admin kitchen GET route:", error);
         return new Response(JSON.stringify({ 
             success: false, 
             error: "Internal server error" 
@@ -53,7 +62,7 @@ export async function GET() {
     }
 }
 
-export async function POST(request) {
+export async function PATCH(request, { params }) {
     try {
         await dbConnect();
 
@@ -75,44 +84,72 @@ export async function POST(request) {
             }), { status: 401 });
         }
 
-        const user = await User.findById(decoded.id);
-        if (!user || user.role !== 'seller') {
+        const admin = await User.findById(decoded.id);
+        if (!admin || admin.role !== 'admin') {
             return new Response(JSON.stringify({ 
                 success: false, 
                 error: "Unauthorized access" 
             }), { status: 403 });
         }
 
-        const kitchenData = await request.json();
+        const kitchenId = params.id;
+        const { status, adminRemarks } = await request.json();
 
-        const kitchen = new Kitchen({
-            ownerId: user._id,
-            ...kitchenData,
-            status: 'pending' // All new kitchens need approval
-        });
+        if (!status || !['approved', 'rejected', 'suspended'].includes(status)) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Invalid status value" 
+            }), { status: 400 });
+        }
 
+        const kitchen = await Kitchen.findById(kitchenId);
+        if (!kitchen) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Kitchen not found" 
+            }), { status: 404 });
+        }
+
+        const owner = await User.findById(kitchen.ownerId);
+        if (!owner) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Kitchen owner not found" 
+            }), { status: 404 });
+        }
+
+        kitchen.status = status;
+        kitchen.adminRemarks = adminRemarks || '';
+        
+        if (status === 'approved') {
+            kitchen.isActive = true;
+        } else {
+            kitchen.isActive = false;
+        }
+        
         await kitchen.save();
 
-        // Send email notification to admin
-        await sendKitchenApprovalEmail({
-            kitchenData: kitchen,
-            ownerDetails: { 
-                name: user.name,
-                email: user.email
-            }
+        await notifyKitchenOwner({
+            ownerEmail: owner.email,
+            ownerName: owner.name,
+            kitchenName: kitchen.name,
+            status,
+            remarks: adminRemarks
         });
 
         return new Response(JSON.stringify({ 
             success: true, 
-            message: "Kitchen created successfully and sent for admin approval",
+            message: `Kitchen ${status} successfully`,
             data: { kitchen }
-        }), { status: 201 });
+        }), { status: 200 });
 
     } catch (error) {
-        console.error("Error in kitchens POST route:", error);
+        console.error("Error in admin kitchen PATCH route:", error);
         return new Response(JSON.stringify({ 
             success: false, 
             error: "Internal server error" 
         }), { status: 500 });
     }
 }
+
+

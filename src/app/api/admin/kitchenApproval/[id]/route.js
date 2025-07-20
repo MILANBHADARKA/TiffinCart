@@ -47,7 +47,6 @@ export async function POST(request, { params }) {
         }
 
         // console.log("Kitchen ID:", id);
-        // Find the kitchen by ID
         const kitchen = await Kitchen.findById(id);
         if (!kitchen) {
             return new Response(JSON.stringify({ 
@@ -70,7 +69,6 @@ export async function POST(request, { params }) {
         const ownerName = owner.name || "Kitchen Owner";
         const ownerEmail = owner.email || "";
 
-        // Send approval email
         const emailSent = await kitchenApprovedEmail({
             ownerName,
             ownerEmail,

@@ -115,15 +115,12 @@ function CustomerOrders() {
       try {
         setSubmitting(true);
 
-        // Debug logging
         console.log('Selected Order for Review:', selectedOrder);
         console.log('Review Type:', reviewType);
         console.log('Selected Menu Item:', selectedMenuItem);
 
-        // Get the seller ID from the order
         let sellerId = selectedOrder.sellerId || selectedOrder.kitchenId;
         
-        // If sellerId is still not available, show detailed error
         if (!sellerId) {
           console.error('No seller ID found in order:', selectedOrder);
           alert('Unable to identify kitchen. Order data: ' + JSON.stringify(selectedOrder, null, 2));
@@ -140,7 +137,6 @@ function CustomerOrders() {
           tags: reviewData.tags || []
         };
 
-        // Add menuItemId for item reviews
         if (reviewType === 'item' && selectedMenuItem) {
           payload.menuItemId = selectedMenuItem.menuItemId || selectedMenuItem._id;
         }
@@ -197,7 +193,6 @@ function CustomerOrders() {
             </div>
 
             <div className="space-y-4">
-              {/* Rating */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${
                   theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -227,7 +222,6 @@ function CustomerOrders() {
                 </p>
               </div>
 
-              {/* Title */}
               <div>
                 <label className={`block text-sm font-medium mb-1 ${
                   theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -251,7 +245,6 @@ function CustomerOrders() {
                 </p>
               </div>
 
-              {/* Comment */}
               <div>
                 <label className={`block text-sm font-medium mb-1 ${
                   theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -275,7 +268,6 @@ function CustomerOrders() {
                 </p>
               </div>
 
-              {/* Tags */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${
                   theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -302,7 +294,6 @@ function CustomerOrders() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <div className="flex space-x-3 pt-4">
                 <button
                   type="button"
@@ -351,7 +342,6 @@ function CustomerOrders() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             My Orders 📦
@@ -361,7 +351,6 @@ function CustomerOrders() {
           </p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -373,7 +362,6 @@ function CustomerOrders() {
           </div>
         )}
 
-        {/* Status Tabs */}
         <div className={`mb-6 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
           <nav className="-mb-px flex space-x-8">
             {[{
@@ -399,7 +387,6 @@ function CustomerOrders() {
           </nav>
         </div>
 
-        {/* Orders List */}
         {orders.length === 0 && !loading ? (
           <div className={`text-center py-12 ${
             theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
@@ -429,7 +416,6 @@ function CustomerOrders() {
                 }`}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                  {/* Order Info */}
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 mb-3">
                       <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -459,7 +445,6 @@ function CustomerOrders() {
                       </div>
                     </div>
 
-                    {/* Order Items */}
                     <div className="mt-4">
                       <h4 className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                         Items ({order.items.length}):
@@ -485,7 +470,6 @@ function CustomerOrders() {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex flex-col space-y-2 lg:ml-6">
                     {order.status === 'delivered' && (
                       <>
@@ -542,7 +526,6 @@ function CustomerOrders() {
           </div>
         )}
 
-        {/* Review Modal */}
         <ReviewModal />
       </div>
     </div>

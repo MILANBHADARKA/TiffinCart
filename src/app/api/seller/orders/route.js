@@ -40,10 +40,9 @@ export async function GET(request) {
         const limit = parseInt(searchParams.get('limit')) || 10;
         const skip = (page - 1) * limit;
 
-        // Build filter
         const filter = { sellerId: user._id };
         if (status && status !== 'all') {
-            filter.status = status;
+        filter.status = status;
         }
 
         const orders = await Order.find(filter)

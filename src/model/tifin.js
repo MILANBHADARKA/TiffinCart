@@ -12,7 +12,7 @@ const tifinSchema = new Schema({
     menuItems: {
         type: [String],
         default: []
-    }, // Array of food items included in the tiffin (roti, dal, sabzi, etc.)
+    }, // (roti, dal, sabzi, etc.)
     category: {
         type: String,
         enum: ["Lunch", "Dinner", "Breakfast", "Snacks"],

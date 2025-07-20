@@ -24,7 +24,6 @@ export async function POST(request) {
             }), { status: 404 });
         }
 
-        // Check if verification code is expired
         if (tempUser.verifyCodeExpires < new Date()) {
             return new Response(JSON.stringify({ 
                 success: false, 
@@ -32,7 +31,6 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Check if verification code matches
         if (tempUser.verifyCode !== verifyCode) {
             return new Response(JSON.stringify({ 
                 success: false, 
@@ -40,7 +38,6 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Create permanent user
         const newUser = new User({
             name: tempUser.name,
             email: tempUser.email,
@@ -53,7 +50,6 @@ export async function POST(request) {
 
         await newUser.save();
 
-        // Delete temporary user
         await TempUser.findByIdAndDelete(tempUser._id);
 
         return new Response(JSON.stringify({ 

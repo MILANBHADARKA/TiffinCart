@@ -6,11 +6,6 @@ const kitchenSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    ownerName: {
-        type: String,
-        required: true,
-        trim: true
-    },
     name: {
         type: String,
         required: true,
@@ -20,6 +15,11 @@ const kitchenSchema = new mongoose.Schema({
         type: String,
         required: true,
         maxLength: 500
+    },
+    cuisine: {
+        type: String,
+        required: true,
+        enum: ['indian', 'chinese', 'italian', 'continental', 'mexican', 'thai', 'japanese', 'korean', 'mediterranean']
     },
     address: {
         street: {
@@ -37,6 +37,10 @@ const kitchenSchema = new mongoose.Schema({
         zipCode: {
             type: String,
             required: true
+        },
+        coordinates: {
+            latitude: Number,
+            longitude: Number
         }
     },
     contact: {
@@ -50,7 +54,7 @@ const kitchenSchema = new mongoose.Schema({
         }
     },
     images: [{
-        type: String // URLs to kitchen images
+        type: String
     }],
     operatingHours: {
         morning: {
@@ -59,53 +63,57 @@ const kitchenSchema = new mongoose.Schema({
                 default: '07:00'
             },
             close: {
-                type: String, // HH:mm format
+                type: String, 
                 default: '10:00'
             }
         },
         afternoon: {
             open: {
-                type: String, // HH:mm format
+                type: String,
                 default: '12:00'
             },
             close: {
-                type: String, // HH:mm format
+                type: String,
                 default: '15:00'
             }
         },
         evening: {
             open: {
-                type: String, // HH:mm format
+                type: String,
                 default: '18:00'
             },
             close: {
-                type: String, // HH:mm format
+                type: String,
                 default: '21:00'
             }
         }
     },
     isCurrentlyOpen: {
-        type: Boolean, 
+        type: Boolean,
+        default: true
+    },
+    isActive: {
+        type: Boolean,
         default: false
     },
-    // deliveryInfo: {
-    //     deliveryRadius: {
-    //         type: Number,
-    //         default: 10 // in kilometers
-    //     },
-    //     minimumOrder: {
-    //         type: Number,
-    //         default: 100 // in currency
-    //     },
-    //     deliveryFee: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     estimatedDeliveryTime: {
-    //         type: Number,
-    //         default: 30 // in minutes
-    //     }
-    // },
+    deliveryInfo: {
+        deliveryRadius: {
+            type: Number,
+            default: 10 // kilometers
+        },
+        minimumOrder: {
+            type: Number,
+            default: 100 
+        },
+        deliveryFee: {
+            type: Number,
+            default: 0
+        },
+        estimatedDeliveryTime: {
+            type: Number,
+            default: 30 // minutes
+        }
+    },
     ratings: {
         average: {
             type: Number,
@@ -118,10 +126,25 @@ const kitchenSchema = new mongoose.Schema({
             default: 0
         }
     },
+    license: {
+        fssaiNumber: String,
+        gstNumber: String,
+        businessLicense: String
+    },
+    bankDetails: {
+        accountNumber: String,
+        ifscCode: String,
+        accountHolderName: String,
+        bankName: String
+    },
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected', 'suspended'],
         default: 'pending'
+    },
+    adminRemarks: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true
@@ -132,9 +155,8 @@ kitchenSchema.index({ ownerId: 1 });
 kitchenSchema.index({ 'address.city': 1, isActive: 1 });
 kitchenSchema.index({ cuisine: 1, isActive: 1 });
 kitchenSchema.index({ 'ratings.average': -1 });
+kitchenSchema.index({ status: 1 });
 
-// const Kitchen = mongoose.models.Kitchen || mongoose.model('Kitchen', kitchenSchema);
+const Kitchen = mongoose.models.Kitchen || mongoose.model('Kitchen', kitchenSchema);
 
-// export default Kitchen;
-
-export default mongoose.models.Kitchen || mongoose.model("Kitchen", kitchenSchema);
+export default Kitchen;

@@ -38,7 +38,6 @@ export async function POST(req) {
             }), { status: 403 });
         }
 
-        //Create new Kitchen
         const { name, description, address, contact, operatingHours } = await req.json();
 
         const { street, city, state, zipCode } = address;
@@ -66,7 +65,6 @@ export async function POST(req) {
             }), { status: 400 });
         }
 
-        // cloudinary upload for kitchen pictures
         const uploadedPictures = [];
 
         for (const picture of kitchenPictures) {
@@ -85,7 +83,6 @@ export async function POST(req) {
             uploadedPictures.push(uploadResult.secure_url);
         }
 
-        // Create Kitchen document
         const kitchen = new Kitchen({
             ownerId: user._id,
             ownerName: user.name,
@@ -119,7 +116,6 @@ export async function POST(req) {
         });
         await kitchen.save();
 
-        // Send approval email to admin
         const adminEmail = process.env.ADMIN_EMAIL;
         const emailSent = await newKitchenApprovalEmail({
             adminEmail,

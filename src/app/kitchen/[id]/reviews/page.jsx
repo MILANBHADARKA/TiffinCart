@@ -98,7 +98,6 @@ function KitchenReviews() {
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => router.back()}
@@ -119,7 +118,6 @@ function KitchenReviews() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Review Summary */}
           <div className="lg:col-span-1">
             <div className={`p-6 rounded-lg border ${
               theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -145,7 +143,6 @@ function KitchenReviews() {
                 </p>
               </div>
 
-              {/* Rating Distribution */}
               <div className="space-y-2">
                 {ratingDistribution.map(({ rating, count, percentage }) => (
                   <div key={rating} className="flex items-center space-x-2">
@@ -165,7 +162,6 @@ function KitchenReviews() {
                 ))}
               </div>
 
-              {/* Filter */}
               <div className="mt-6">
                 <label className={`block text-sm font-medium mb-2 ${
                   theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
@@ -192,7 +188,6 @@ function KitchenReviews() {
             </div>
           </div>
 
-          {/* Reviews List */}
           <div className="lg:col-span-3">
             {filteredReviews.length === 0 ? (
               <div className={`text-center py-12 ${

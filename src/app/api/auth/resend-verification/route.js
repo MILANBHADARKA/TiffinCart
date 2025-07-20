@@ -24,16 +24,13 @@ export async function POST(request) {
             }), { status: 404 });
         }
 
-        // Generate new verification code
         const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
         const verifyCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
 
-        // Update temporary user with new code
         tempUser.verifyCode = verifyCode;
         tempUser.verifyCodeExpires = verifyCodeExpires;
         await tempUser.save();
 
-        // Send verification email
         const emailSent = await sendverificationEmail({
             to: email,
             name: tempUser.name,

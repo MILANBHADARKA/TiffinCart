@@ -1,1 +1,0 @@
-// kitches of their city (at this time idea is to store curret city in local storage and use it to fetch kitchens)

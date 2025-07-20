@@ -36,7 +36,6 @@ export async function GET() {
             }), { status: 403 });
         }
 
-        // Aggregate dashboard data
         const [
             totalOrders,
             activeOrders,
@@ -45,32 +44,26 @@ export async function GET() {
             nearbyKitchens,
             kitchenRatings
         ] = await Promise.all([
-            // Total orders count
             Order.countDocuments({ customerId: user._id }),
             
-            // Active orders count
             Order.countDocuments({ 
                 customerId: user._id, 
                 status: { $in: ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery'] }
             }),
             
-            // Favorite kitchens count
             Favorite.countDocuments({ customerId: user._id }),
             
-            // Recent orders
             Order.find({ customerId: user._id })
                 .populate('sellerId', 'name')
                 .sort({ createdAt: -1 })
                 .limit(5)
                 .lean(),
             
-            // Nearby kitchens (sellers)
             User.find({ role: 'seller' })
                 .select('name email rating totalRatings')
                 .limit(5)
                 .lean(),
 
-            // Get rating data for kitchens
             Review.aggregate([
                 { $match: { type: 'kitchen' } },
                 {
@@ -83,7 +76,6 @@ export async function GET() {
             ])
         ]);
 
-        // Create rating map
         const ratingMap = {};
         kitchenRatings.forEach(item => {
             ratingMap[item._id.toString()] = {

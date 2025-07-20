@@ -101,8 +101,7 @@ function KitchenManagement() {
     <div className={`min-h-screen transition-colors duration-300 ${
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> 
         <div className="mb-8">
           <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Kitchen Management 🏪
@@ -112,7 +111,6 @@ function KitchenManagement() {
           </p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -124,7 +122,6 @@ function KitchenManagement() {
           </div>
         )}
 
-        {/* Kitchen Status Card */}
         <div className={`p-6 rounded-lg border mb-8 ${
           theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>
@@ -179,7 +176,6 @@ function KitchenManagement() {
           </div>
         </div>
 
-        {/* Operating Hours Card */}
         <div className={`p-6 rounded-lg border ${
           theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>
@@ -239,7 +235,6 @@ function KitchenManagement() {
           </div>
         </div>
 
-        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           <div className={`p-6 rounded-lg border text-center ${
             theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
