@@ -1,0 +1,195 @@
+import dbConnect from "@/lib/dbConnect";
+import User from "@/model/user";
+import Kitchen from "@/model/kitchen";
+import { verifyToken } from "@/lib/jwt";
+import { cookies } from 'next/headers';
+import { newKitchenApprovalEmail } from "@/helper/newKitchenApprovalEmail";
+import { cloudinary } from "@/lib/cloudinary";
+
+
+export async function GET(req, { params }) {
+    try {
+        await dbConnect();
+
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token');
+
+        if (!token) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "No token found"
+            }), { status: 401 });
+        }
+
+        const decoded = verifyToken(token.value);
+        if (!decoded) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Invalid token"
+            }), { status: 401 });
+        }
+
+        const user = await User.findById(decoded.id);
+
+        if (!user) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Unauthorized access"
+            }), { status: 403 });
+        }
+
+        const { id } = params;
+
+        if (!id) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Kitchen ID is required"
+            }), { status: 400 });
+        }
+
+        // Find Kitchen
+        const kitchen = await Kitchen.findById(id);
+        if (!kitchen) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Kitchen not found"
+            }), { status: 404 });
+        }
+
+        return new Response(JSON.stringify({
+            success: true,
+            kitchen
+        }), { status: 200 });
+
+    } catch (error) {
+        return new Response(JSON.stringify({
+            success: false,
+            error: "Internal server error"
+        }), { status: 500 });
+    }
+}
+
+
+export async function PUT(req, { params }) {
+    try {
+        await dbConnect();
+
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token');
+
+        if (!token) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "No token found"
+            }), { status: 401 });
+        }
+
+        const decoded = verifyToken(token.value);
+        if (!decoded) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Invalid token"
+            }), { status: 401 });
+        }
+
+        const user = await User.findById(decoded.id);
+
+        if (!user || user.role !== 'seller') {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Unauthorized access"
+            }), { status: 403 });
+        }
+
+        const { id } = params;
+
+        if (!id) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Kitchen ID is required"
+            }), { status: 400 });
+        }
+
+        // Find and kitchen
+        const kitchen = await Kitchen.findById(id);
+
+        if (!kitchen) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Kitchen not found"
+            }), { status: 404 });
+        }
+
+        if (kitchen.ownerId.toString() !== user._id.toString()) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "You are not authorized to update this kitchen"
+            }), { status: 403 });
+        }
+
+        if (!kitchen) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Kitchen not found"
+            }), { status: 404 });
+        }
+
+        const body = await req.json();
+
+        //update value that are provided otherwise keep the existing values
+
+        const updatedData = {
+            name: body.name || kitchen.name,
+            description: body.description || kitchen.description,
+            address: {
+                street: body.address?.street || kitchen.address.street,
+                city: body.address?.city || kitchen.address.city,
+                state: body.address?.state || kitchen.address.state,
+                zipCode: body.address?.zipCode || kitchen.address.zipCode
+            },
+            contact: {
+                phone: body.contact?.phone || kitchen.contact.phone,
+                email: body.contact?.email || kitchen.contact.email
+            },
+            // add isCurrentlyOpen boolean field (coming as string from frontend)
+            isCurrentlyOpen: body.isCurrentlyOpen === 'True'
+        };
+
+        const kitchenPictures = req.files?.kitchenPictures || [];
+
+        if (kitchenPictures.length > 0) {
+            const uploadedPictures = await Promise.all(kitchenPictures.map(async (file) => {
+                const uploadResult = await cloudinary.uploader.upload(file.path, {
+                    folder: 'kitchens',
+                    resource_type: 'image'
+                });
+                return uploadResult.secure_url;
+            }));
+
+            updatedData.pictures = uploadedPictures;
+        }
+
+        // Update Kitchen
+        const updatedKitchen = await Kitchen.findByIdAndUpdate(id, updatedData, { new: true });
+
+        if (!updatedKitchen) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Failed to update kitchen"
+            }), { status: 500 });
+        }
+
+
+        return new Response(JSON.stringify({
+            success: true,
+            message: "Kitchen updated successfully"
+        }), { status: 200 });
+    }
+    catch (error) {
+        console.error("Error in kitchen status update route:", error);
+        return new Response(JSON.stringify({
+            success: false,
+            error: "Internal server error"
+        }), { status: 500 });
+    }
+}

@@ -1,0 +1,1 @@
+// that kitchen details are fetched from the database and returned in the response.

@@ -1,21 +1,11 @@
 import { serialize } from 'cookie';
 
 export function setTokenCookie(token) {
-  return serialize('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60 // 7 days
-  });
+    const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
+    
+    return `token=${token}; Max-Age=${maxAge}; Path=/; HttpOnly; SameSite=Strict; ${process.env.NODE_ENV === 'production' ? 'Secure;' : ''}`;
 }
 
 export function clearTokenCookie() {
-  return serialize('token', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
-    path: '/',
-    maxAge: 0,
-  });
+    return `token=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict; ${process.env.NODE_ENV === 'production' ? 'Secure;' : ''}`;
 }

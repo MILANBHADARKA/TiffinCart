@@ -12,7 +12,8 @@ export const signUpSchema = z.object({
     .min(1, "Email is required"),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters"),
+    .min(8, "Password must be at least 8 characters")
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Password must contain at least one uppercase letter, one lowercase letter, and one number"),
   role: z
     .enum(["customer", "seller"], {
       required_error: "Please select a role",

@@ -1,44 +1,53 @@
 import mongoose, {Schema} from "mongoose";
 
 const tempUserSchema = new Schema({
-    name: { 
-        type: String, 
-        required: true 
+    name: {
+        type: String,
+        required: true,
+        trim: true
     },
-    email: { 
-        type: String, 
-        required: true, 
-        unique: true 
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true
     },
-    password: { 
-        type: String, 
-        required: true 
+    password: {
+        type: String,
+        required: true
     },
-    phonenumber: { 
-        type: String 
+    role: {
+        type: String,
+        enum: ['customer', 'seller'],
+        required: true
     },
-    address: { 
-        type: String 
-    }, 
-    role: { 
-        type: String, 
-        enum: ["customer", "seller"], 
-        required: true 
+    verifyCode: {
+        type: String,
+        required: true
+    },
+    verifyCodeExpires: {
+        type: Date,
+        required: true
     },
     profilePicture: {
         type: String,
         default: ""
     },
-    verifyCode: {
+    address: {
         type: String,
-        required: [true, "Verification code is required!"]
+        default: ""
     },
-    verifyCodeExpires: {
-        type: Date,
-        required: [true, "Verification code expiry is required!"]
+    phonenumber: {
+        type: String,
+        default: ""
     }
-},{
+}, {
     timestamps: true
-})
+});
 
-export default mongoose.models.TempUser || mongoose.model("TempUser", tempUserSchema);
+// Auto-delete expired temp users
+tempUserSchema.index({ verifyCodeExpires: 1 }, { expireAfterSeconds: 0 });
+
+const TempUser = mongoose.models.TempUser || mongoose.model('TempUser', tempUserSchema);
+
+export default TempUser;

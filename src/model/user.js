@@ -3,23 +3,41 @@ import mongoose, {Schema} from "mongoose";
 const userSchema = new Schema({
     name: { 
         type: String, 
-        required: true 
+        required: true,
+        trim: true
     },
     email: { 
         type: String, 
         required: true, 
-        unique: true 
+        unique: true,
+        lowercase: true
     },
     password: { 
         type: String, 
         required: true 
     },
     phonenumber: { 
-        type: String 
+        type: String,
+        default: ""
     },
-    address: { 
-        type: String 
-    }, 
+    address: {
+        street: { 
+            type: String, 
+            default: "" 
+        },
+        city: { 
+            type: String, 
+            default: "" 
+        },
+        state: { 
+            type: String, 
+            default: "" 
+        },
+        zipCode: { 
+            type: String, 
+            default: "" 
+        }
+    },
     role: { 
         type: String, 
         enum: ["customer", "seller"], 
