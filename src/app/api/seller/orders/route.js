@@ -13,7 +13,7 @@ export async function GET(request) {
 
         if (!token) {
             return new Response(JSON.stringify({ 
-                success: false, 
+                success: false,
                 error: "No token found" 
             }), { status: 401 });
         }
@@ -34,59 +34,20 @@ export async function GET(request) {
             }), { status: 403 });
         }
 
-        const { searchParams } = new URL(request.url);
-        const status = searchParams.get('status');
-        const page = parseInt(searchParams.get('page')) || 1;
-        const limit = parseInt(searchParams.get('limit')) || 10;
-        const skip = (page - 1) * limit;
-
-        const filter = { sellerId: user._id };
-        if (status && status !== 'all') {
-        filter.status = status;
-        }
-
-        const orders = await Order.find(filter)
-            .populate('customerId', 'name email phonenumber')
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .lean();
-
-        const totalOrders = await Order.countDocuments(filter);
-
-        const formattedOrders = orders.map(order => ({
-            id: `#ORD-${order._id.toString().slice(-6).toUpperCase()}`,
-            orderId: order._id,
-            customer: order.customerId?.name || 'Unknown Customer',
-            phone: order.customerId?.phonenumber || 'No phone',
-            email: order.customerId?.email || '',
-            items: order.items.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price
-            })),
-            total: order.totalAmount,
-            status: order.status,
-            orderTime: getTimeAgo(order.createdAt),
-            address: order.deliveryAddress || 'No address provided',
-            paymentMethod: order.paymentMethod || 'cash',
-            specialInstructions: order.specialInstructions || ''
-        }));
+        // Find all orders for this seller's kitchens
+        const orders = await Order.find({ sellerId: user._id })
+            .populate('customerId', 'name email')
+            .populate('kitchenId', 'name')
+            .sort({ createdAt: -1 });
 
         return new Response(JSON.stringify({ 
             success: true, 
-            data: {
-                orders: formattedOrders,
-                pagination: {
-                    current: page,
-                    total: Math.ceil(totalOrders / limit),
-                    count: totalOrders
-                }
-            }
+            data: { orders },
+            message: "Orders retrieved successfully"
         }), { status: 200 });
 
     } catch (error) {
-        console.error("Error in orders route:", error);
+        console.error("Error in seller orders route:", error);
         return new Response(JSON.stringify({ 
             success: false, 
             error: "Internal server error" 
@@ -133,6 +94,14 @@ export async function PUT(request) {
             }), { status: 400 });
         }
 
+        const validStatuses = ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'];
+        if (!validStatuses.includes(status)) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Invalid status" 
+            }), { status: 400 });
+        }
+
         const order = await Order.findOne({ 
             _id: orderId, 
             sellerId: user._id 
@@ -147,10 +116,18 @@ export async function PUT(request) {
 
         order.status = status;
         order.updatedAt = new Date();
+        
+        // Add to status history
+        order.statusHistory.push({
+            status: status,
+            timestamp: new Date()
+        });
+
         await order.save();
 
         return new Response(JSON.stringify({ 
             success: true, 
+            data: { order },
             message: "Order status updated successfully" 
         }), { status: 200 });
 
@@ -163,12 +140,3 @@ export async function PUT(request) {
     }
 }
 
-function getTimeAgo(date) {
-    const now = new Date();
-    const diffInMinutes = Math.floor((now - new Date(date)) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes} mins ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
-    return `${Math.floor(diffInMinutes / 1440)} days ago`;
-}

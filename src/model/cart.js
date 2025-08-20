@@ -6,9 +6,9 @@ const cartItemSchema = new mongoose.Schema({
         ref: 'MenuItem',
         required: true
     },
-    sellerId: {
+    kitchenId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Kitchen',
         required: true
     },
     name: {
@@ -17,50 +17,42 @@ const cartItemSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true,
-        min: 0
+        required: true
     },
     quantity: {
         type: Number,
         required: true,
         min: 1
     },
-    specialInstructions: {
-        type: String,
-        default: ''
-    }
+    image: String,
+    isVeg: Boolean
 });
 
 const cartSchema = new mongoose.Schema({
-    customerId: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
         unique: true
     },
     items: [cartItemSchema],
-    totalAmount: {
-        type: Number,
-        default: 0,
-        min: 0
-    },
     updatedAt: {
         type: Date,
         default: Date.now
     }
-}, {
-    timestamps: true
 });
 
-// Index for better query performance
-cartSchema.index({ customerId: 1 });
-
-// Update totalAmount before saving
-cartSchema.pre('save', function() {
-    this.totalAmount = this.items.reduce((total, item) => {
+// Calculate cart total
+cartSchema.virtual('total').get(function() {
+    return this.items.reduce((total, item) => {
         return total + (item.price * item.quantity);
     }, 0);
+});
+
+// Pre-save middleware to update the updatedAt field
+cartSchema.pre('save', function(next) {
     this.updatedAt = new Date();
+    next();
 });
 
 const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);

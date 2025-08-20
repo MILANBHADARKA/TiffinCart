@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signInSchema } from '@/lib/validationSchemas';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
+import TifinLogo from '@/components/Logo/TifinLogo';
 
 function SignInPage() {
   const [message, setMessage] = useState('');
@@ -74,16 +75,14 @@ function SignInPage() {
             </button>
           </div>
           
-          <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mb-4">
-            <svg className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
+          <div className="flex justify-center mb-4">
+            <TifinLogo size="large" />
           </div>
           <h2 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Welcome back to <span className="text-orange-600">TifinCart</span>
           </h2>
           <p className={`mt-2 text-sm sm:text-base ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-            Sign in to continue your food journey
+            Sign in to continue your tiffin journey
           </p>
           <p className={`mt-1 text-xs sm:text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
             Don't have an account?{' '}
@@ -118,6 +117,8 @@ function SignInPage() {
                         : 'border-gray-300 bg-white text-gray-900'
                   }`}
                   placeholder="Enter your email"
+                  autoFocus="true"
+                  autoComplete="email"
                 />
                 <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
                   <svg className={`h-4 w-4 sm:h-5 sm:w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

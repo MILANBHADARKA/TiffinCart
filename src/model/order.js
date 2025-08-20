@@ -1,5 +1,4 @@
-import mongoose, { Schema } from "mongoose";
-
+import mongoose from 'mongoose';
 
 const orderItemSchema = new mongoose.Schema({
     menuItemId: {
@@ -11,19 +10,25 @@ const orderItemSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    price: {
+        type: Number,
+        required: true
+    },
     quantity: {
         type: Number,
         required: true,
         min: 1
     },
-    price: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    specialInstructions: {
-        type: String,
-        default: ''
+    isVeg: Boolean,
+    // Add review for individual items
+    review: {
+        rating: {
+            type: Number,
+            min: 1,
+            max: 5
+        },
+        comment: String,
+        timestamp: Date
     }
 });
 
@@ -38,64 +43,98 @@ const orderSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    kitchenId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Kitchen',
+        required: true
+    },
     items: [orderItemSchema],
-    totalAmount: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'],
-        default: 'pending'
-    },
-    paymentMethod: {
-        type: String,
-        enum: ['cash', 'online', 'card'],
-        default: 'cash'
-    },
-    paymentStatus: {
-        type: String,
-        enum: ['pending', 'paid', 'failed', 'refunded'],
-        default: 'pending'
-    },
     deliveryAddress: {
         type: String,
         required: true
     },
-    deliveryCoordinates: {
-        latitude: Number,
-        longitude: Number
-    },
-    specialInstructions: {
+    paymentMethod: {
         type: String,
-        default: ''
+        enum: ['cash', 'online'],
+        required: true
     },
-    estimatedDeliveryTime: {
-        type: Date
+    paymentStatus: {
+        type: String,
+        enum: ['pending', 'completed', 'failed', 'refunded'],
+        default: 'pending'
     },
-    actualDeliveryTime: {
-        type: Date
+    status: {
+        type: String,
+        enum: ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'],
+        default: 'pending'
     },
-    rating: {
+    subtotal: {
         type: Number,
-        min: 1,
-        max: 5
+        required: true
     },
-    review: {
-        type: String
+    deliveryFee: {
+        type: Number,
+        required: true
     },
-    cancelReason: {
-        type: String
+    tax: {
+        type: Number,
+        required: true
+    },
+    totalAmount: {
+        type: Number,
+        required: true
+    },
+    statusHistory: [{
+        status: {
+            type: String,
+            enum: ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled']
+        },
+        timestamp: {
+            type: Date,
+            default: Date.now
+        },
+        note: String
+    }],
+    // Kitchen-level review (overall experience)
+    kitchenReview: {
+        rating: {
+            type: Number,
+            min: 1,
+            max: 5
+        },
+        comment: String,
+        timestamp: Date,
+        // Review categories
+        categories: {
+            foodQuality: { type: Number, min: 1, max: 5 },
+            packaging: { type: Number, min: 1, max: 5 },
+            deliveryTime: { type: Number, min: 1, max: 5 },
+            value: { type: Number, min: 1, max: 5 }
+        }
+    },
+    // Track if reviews are completed
+    reviewStatus: {
+        itemReviewsCompleted: { type: Boolean, default: false },
+        kitchenReviewCompleted: { type: Boolean, default: false }
     }
 }, {
     timestamps: true
 });
 
-// Indexes for better query performance
-orderSchema.index({ customerId: 1, createdAt: -1 });
-orderSchema.index({ sellerId: 1, createdAt: -1 });
-orderSchema.index({ status: 1 });
+// Add status change to history automatically
+orderSchema.pre('save', function(next) {
+    const order = this;
+    
+    // If this is a new order or status has changed
+    if (order.isNew || order.isModified('status')) {
+        order.statusHistory.push({
+            status: order.status,
+            timestamp: new Date()
+        });
+    }
+    
+    next();
+});
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 

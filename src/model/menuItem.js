@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
 const menuItemSchema = new mongoose.Schema({
-    sellerId: {
+    kitchenId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Kitchen',
         required: true
     },
     name: {
@@ -13,7 +13,8 @@ const menuItemSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     price: {
         type: Number,
@@ -23,79 +24,90 @@ const menuItemSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: ['appetizer', 'main_course', 'dessert', 'beverage', 'snack', 'breakfast', 'lunch', 'dinner']
+        enum: ['Breakfast', 'Lunch', 'Dinner'],
+        trim: true
     },
-    cuisine: {
-        type: String,
-        default: 'indian'
+    image: {
+        type: String, // Cloudinary URL
+        default: ''
     },
-    isVegetarian: {
+    imagePublicId: {
+        type: String, // Cloudinary public ID for deletion
+        default: ''
+    },
+    isVeg: {
         type: Boolean,
         default: true
     },
-    isVegan: {
-        type: Boolean,
-        default: false
-    },
-    isGlutenFree: {
-        type: Boolean,
-        default: false
-    },
-    spiceLevel: {
-        type: String,
-        enum: ['mild', 'medium', 'hot', 'very_hot'],
-        default: 'medium'
-    },
-    preparationTime: {
-        type: Number,
-        required: true,
-        min: 5
-    },
-    ingredients: [{
-        type: String
-    }],
-    allergens: [{
-        type: String
-    }],
-    nutritionalInfo: {
-        calories: Number,
-        protein: Number,
-        carbohydrates: Number,
-        fat: Number,
-        fiber: Number
-    },
-    images: [{
-        type: String
-    }],
     isAvailable: {
         type: Boolean,
         default: true
     },
-    availableQuantity: {
-        type: Number,
-        default: 100
+    spiciness: {
+        type: String,
+        enum: ['mild', 'medium', 'hot'],
+        default: 'medium'
     },
-    rating: {
-        type: Number,
-        default: 0,
-        min: 0,
-        max: 5
+    // Tiffin delivery schedule
+    deliverySchedule: {
+        breakfast: {
+            startTime: { type: String, default: '07:00' }, // 7:00 AM
+            endTime: { type: String, default: '10:00' }    // 10:00 AM
+        },
+        lunch: {
+            startTime: { type: String, default: '12:00' }, // 12:00 PM
+            endTime: { type: String, default: '15:00' }    // 3:00 PM
+        },
+        dinner: {
+            startTime: { type: String, default: '19:00' }, // 7:00 PM
+            endTime: { type: String, default: '22:00' }    // 10:00 PM
+        }
     },
-    reviewCount: {
+    // Advance order requirement (hours)
+    advanceOrderHours: {
+        type: Number,
+        default: 3 // Customer must order at least 3 hours in advance
+    },
+    ingredients: [{
+        type: String,
+        trim: true
+    }],
+    nutritionInfo: {
+        calories: Number,
+        protein: Number,
+        carbs: Number,
+        fat: Number
+    },
+    allergens: [{
+        type: String,
+        trim: true
+    }],
+    tags: [{
+        type: String,
+        trim: true
+    }],
+    orderCount: {
         type: Number,
         default: 0
     },
-    tags: [{
-        type: String
-    }]
+    // Tiffin specific fields
+    servingSize: {
+        type: String,
+        default: '1 person'
+    },
+    packaging: {
+        type: String,
+        default: 'Eco-friendly container'
+    }
 }, {
     timestamps: true
 });
 
 // Indexes for better query performance
-menuItemSchema.index({ sellerId: 1, isAvailable: 1 });
-menuItemSchema.index({ category: 1, isAvailable: 1 });
-menuItemSchema.index({ name: 'text', description: 'text' });
+menuItemSchema.index({ kitchenId: 1 });
+menuItemSchema.index({ category: 1 });
+menuItemSchema.index({ isVeg: 1 });
+menuItemSchema.index({ isAvailable: 1 });
 
 const MenuItem = mongoose.models.MenuItem || mongoose.model('MenuItem', menuItemSchema);
 

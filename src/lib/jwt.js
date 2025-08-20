@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-super-secret-jwt-key-change-t
 // Generate token
 export function generateToken(payload) {
     try {
-        return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+        return jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
     } catch (error) {
         console.error("Error generating token:", error);
         return null;

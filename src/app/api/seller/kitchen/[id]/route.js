@@ -3,71 +3,65 @@ import User from "@/model/user";
 import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
-import { newKitchenApprovalEmail } from "@/helper/newKitchenApprovalEmail";
 import { cloudinary } from "@/lib/cloudinary";
 
 
-export async function GET(req, { params }) {
+export async function GET(request, { params }) {
     try {
         await dbConnect();
 
+        const kitchenId = params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
         if (!token) {
-            return new Response(JSON.stringify({
-                success: false,
-                error: "No token found"
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "No token found" 
             }), { status: 401 });
         }
 
         const decoded = verifyToken(token.value);
         if (!decoded) {
-            return new Response(JSON.stringify({
-                success: false,
-                error: "Invalid token"
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Invalid token" 
             }), { status: 401 });
         }
 
         const user = await User.findById(decoded.id);
-
-        if (!user) {
-            return new Response(JSON.stringify({
-                success: false,
-                error: "Unauthorized access"
+        if (!user || user.role !== 'seller') {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Unauthorized access" 
             }), { status: 403 });
         }
 
-        const { id } = params;
+        const kitchen = await Kitchen.findOne({ 
+            _id: kitchenId, 
+            ownerId: user._id 
+        }).lean();
 
-        if (!id) {
-            return new Response(JSON.stringify({
-                success: false,
-                error: "Kitchen ID is required"
-            }), { status: 400 });
-        }
-
-        const kitchen = await Kitchen.findById(id);
         if (!kitchen) {
-            return new Response(JSON.stringify({
-                success: false,
-                error: "Kitchen not found"
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Kitchen not found or you don't have permission" 
             }), { status: 404 });
         }
 
-        return new Response(JSON.stringify({
-            success: true,
-            kitchen
+        return new Response(JSON.stringify({ 
+            success: true, 
+            data: { kitchen } 
         }), { status: 200 });
 
     } catch (error) {
-        return new Response(JSON.stringify({
-            success: false,
-            error: "Internal server error"
+        console.error("Error in kitchen GET route:", error);
+        return new Response(JSON.stringify({ 
+            success: false, 
+            error: "Internal server error" 
         }), { status: 500 });
     }
 }
-
 
 export async function PUT(req, { params }) {
     try {
@@ -185,6 +179,86 @@ export async function PUT(req, { params }) {
         return new Response(JSON.stringify({
             success: false,
             error: "Internal server error"
+        }), { status: 500 });
+    }
+}
+
+export async function PATCH(request, { params }) {
+    try {
+        await dbConnect();
+
+        const kitchenId = params.id;
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token');
+
+        if (!token) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "No token found" 
+            }), { status: 401 });
+        }
+
+        const decoded = verifyToken(token.value);
+        if (!decoded) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Invalid token" 
+            }), { status: 401 });
+        }
+
+        const user = await User.findById(decoded.id);
+        if (!user || user.role !== 'seller') {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Unauthorized access" 
+            }), { status: 403 });
+        }
+
+        const updates = await request.json();
+        
+        // Fields that are allowed to be updated by seller
+        const allowedUpdates = [
+            'name', 
+            'description', 
+            'cuisine', 
+            'operatingHours',
+            'contact',
+            'isCurrentlyOpen',
+            'deliveryInfo',
+            'images'
+        ];
+        
+        // Filter out updates that aren't allowed
+        const filteredUpdates = Object.keys(updates)
+            .filter(key => allowedUpdates.includes(key))
+            .reduce((obj, key) => {
+                obj[key] = updates[key];
+                return obj;
+            }, {});
+        
+        const kitchen = await Kitchen.findOneAndUpdate(
+            { _id: kitchenId, ownerId: user._id },
+            { $set: filteredUpdates },
+            { new: true }
+        );
+
+        if (!kitchen) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "Kitchen not found or you don't have permission" 
+            }), { status: 404 });
+        }
+
+        return new Response(JSON.stringify({ 
+            success: true, 
+            data: { kitchen } 
+        }), { status: 200 });
+
+    } catch (error) {
+        console.error("Error in kitchen PATCH route:", error);
+        return new Response(JSON.stringify({ 
+            success: false, 
+            error: "Internal server error" 
         }), { status: 500 });
     }
 }

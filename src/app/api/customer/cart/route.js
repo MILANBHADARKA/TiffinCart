@@ -2,10 +2,12 @@ import dbConnect from "@/lib/dbConnect";
 import User from "@/model/user";
 import Cart from "@/model/cart";
 import MenuItem from "@/model/menuItem";
+import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
 
-export async function GET() {
+// GET cart contents
+export async function GET(request) {
     try {
         await dbConnect();
 
@@ -28,29 +30,32 @@ export async function GET() {
         }
 
         const user = await User.findById(decoded.id);
-        if (!user) {
+        if (!user || user.role !== 'customer') {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "User not found" 
-            }), { status: 404 });
+                error: "Unauthorized access" 
+            }), { status: 403 });
         }
 
-        let cart = await Cart.findOne({ customerId: user._id })
-            .populate('items.menuItemId', 'name description category isAvailable')
-            .populate('items.sellerId', 'name email');
-
+        // Get or create cart
+        let cart = await Cart.findOne({ userId: user._id });
+        
         if (!cart) {
-            cart = new Cart({ 
-                customerId: user._id, 
-                items: [], 
-                totalAmount: 0 
-            });
+            cart = new Cart({ userId: user._id, items: [] });
             await cart.save();
         }
 
+        // Calculate total
+        const total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
         return new Response(JSON.stringify({ 
             success: true, 
-            data: { cart }
+            data: { 
+                cart: {
+                    items: cart.items,
+                    total
+                }
+            }
         }), { status: 200 });
 
     } catch (error) {
@@ -62,6 +67,7 @@ export async function GET() {
     }
 }
 
+// Add item to cart
 export async function POST(request) {
     try {
         await dbConnect();
@@ -85,14 +91,14 @@ export async function POST(request) {
         }
 
         const user = await User.findById(decoded.id);
-        if (!user) {
+        if (!user || user.role !== 'customer') {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "User not found" 
-            }), { status: 404 });
+                error: "Unauthorized access" 
+            }), { status: 403 });
         }
 
-        const { menuItemId, quantity = 1, specialInstructions = '' } = await request.json();
+        const { menuItemId, quantity = 1 } = await request.json();
 
         if (!menuItemId) {
             return new Response(JSON.stringify({ 
@@ -101,55 +107,72 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        const menuItem = await MenuItem.findById(menuItemId).populate('sellerId', 'name');
-        if (!menuItem || !menuItem.isAvailable) {
+        // Check if the menu item exists and is available
+        const menuItem = await MenuItem.findById(menuItemId);
+        if (!menuItem) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "Menu item not available" 
+                error: "Menu item not found" 
             }), { status: 404 });
         }
 
-        let cart = await Cart.findOne({ customerId: user._id });
+        if (!menuItem.isAvailable) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "This item is currently unavailable" 
+            }), { status: 400 });
+        }
+
+        // Check if the kitchen is open
+        const kitchen = await Kitchen.findById(menuItem.kitchenId);
+        if (!kitchen || !kitchen.isCurrentlyOpen || kitchen.status !== 'approved') {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "The kitchen is currently closed or not available" 
+            }), { status: 400 });
+        }
+
+        // Get or create cart
+        let cart = await Cart.findOne({ userId: user._id });
+        
         if (!cart) {
-            cart = new Cart({ customerId: user._id, items: [] });
+            cart = new Cart({ userId: user._id, items: [] });
         }
 
-        if (cart.items.length > 0) {
-            const existingSellerId = cart.items[0].sellerId.toString();
-            if (existingSellerId !== menuItem.sellerId._id.toString()) {
-                return new Response(JSON.stringify({ 
-                    success: false, 
-                    error: "Cannot add items from different restaurants. Please clear your cart first." 
-                }), { status: 400 });
-            }
-        }
-
+        // Check if item already exists in cart
         const existingItemIndex = cart.items.findIndex(
             item => item.menuItemId.toString() === menuItemId
         );
 
         if (existingItemIndex > -1) {
+            // Update quantity if item exists
             cart.items[existingItemIndex].quantity += quantity;
         } else {
+            // Add new item if it doesn't exist
             cart.items.push({
-                menuItemId: menuItem._id,
-                sellerId: menuItem.sellerId._id,
+                menuItemId,
+                kitchenId: menuItem.kitchenId,
                 name: menuItem.name,
                 price: menuItem.price,
                 quantity,
-                specialInstructions
+                image: menuItem.image,
+                isVeg: menuItem.isVeg
             });
         }
 
         await cart.save();
 
-        await cart.populate('items.menuItemId', 'name description category isAvailable');
-        await cart.populate('items.sellerId', 'name email');
+        // Calculate total
+        const total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
         return new Response(JSON.stringify({ 
             success: true, 
-            message: "Item added to cart",
-            data: { cart }
+            data: { 
+                cart: {
+                    items: cart.items,
+                    total
+                }
+            }
         }), { status: 200 });
 
     } catch (error) {
@@ -161,6 +184,7 @@ export async function POST(request) {
     }
 }
 
+// Update cart item
 export async function PUT(request) {
     try {
         await dbConnect();
@@ -184,11 +208,11 @@ export async function PUT(request) {
         }
 
         const user = await User.findById(decoded.id);
-        if (!user) {
+        if (!user || user.role !== 'customer') {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "User not found" 
-            }), { status: 404 });
+                error: "Unauthorized access" 
+            }), { status: 403 });
         }
 
         const { menuItemId, quantity, specialInstructions } = await request.json();
@@ -200,7 +224,7 @@ export async function PUT(request) {
             }), { status: 400 });
         }
 
-        const cart = await Cart.findOne({ customerId: user._id });
+        const cart = await Cart.findOne({ userId: user._id });
         if (!cart) {
             return new Response(JSON.stringify({ 
                 success: false, 
@@ -248,6 +272,7 @@ export async function PUT(request) {
     }
 }
 
+// Delete cart item or clear cart
 export async function DELETE(request) {
     try {
         await dbConnect();
@@ -271,17 +296,17 @@ export async function DELETE(request) {
         }
 
         const user = await User.findById(decoded.id);
-        if (!user) {
+        if (!user || user.role !== 'customer') {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "User not found" 
-            }), { status: 404 });
+                error: "Unauthorized access" 
+            }), { status: 403 });
         }
 
         const { searchParams } = new URL(request.url);
         const itemId = searchParams.get('itemId');
 
-        const cart = await Cart.findOne({ customerId: user._id });
+        const cart = await Cart.findOne({ userId: user._id });
         if (!cart) {
             return new Response(JSON.stringify({ 
                 success: false, 

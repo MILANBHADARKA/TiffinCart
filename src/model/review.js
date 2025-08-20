@@ -11,72 +11,55 @@ const reviewSchema = new mongoose.Schema({
         ref: 'Order',
         required: true
     },
-    sellerId: {
+    
+    // Kitchen review
+    kitchenId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: 'Kitchen'
     },
-    menuItemId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'MenuItem',
-        required: false // Only for item-specific reviews
-    },
-    type: {
-        type: String,
-        enum: ['kitchen', 'item'],
-        required: true
-    },
-    rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 5
-    },
-    title: {
-        type: String,
-        required: true,
-        maxLength: 100
-    },
-    comment: {
-        type: String,
-        required: true,
-        maxLength: 500
-    },
-    tags: [{
-        type: String,
-        enum: ['taste', 'quality', 'packaging', 'delivery', 'value', 'freshness', 'quantity', 'service']
-    }],
-    images: [{
-        type: String
-    }],
-    isVerifiedPurchase: {
-        type: Boolean,
-        default: true
-    },
-    helpful: {
-        type: Number,
-        default: 0
-    },
-    helpfulBy: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    sellerResponse: {
+    kitchenReview: {
+        rating: { type: Number, min: 1, max: 5 },
         comment: String,
-        respondedAt: Date
+        categories: {
+            foodQuality: { type: Number, min: 1, max: 5 },
+            packaging: { type: Number, min: 1, max: 5 },
+            deliveryTime: { type: Number, min: 1, max: 5 },
+            value: { type: Number, min: 1, max: 5 }
+        }
+    },
+    
+    // Menu item reviews
+    itemReviews: [{
+        menuItemId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'MenuItem',
+            required: true
+        },
+        itemName: String,
+        rating: { type: Number, min: 1, max: 5, required: true },
+        comment: String,
+        categories: {
+            taste: { type: Number, min: 1, max: 5 },
+            freshness: { type: Number, min: 1, max: 5 },
+            portion: { type: Number, min: 1, max: 5 },
+            spiceLevel: { type: Number, min: 1, max: 5 }
+        }
+    }],
+    
+    // Review metadata
+    isVerified: { type: Boolean, default: true }, // Since it's from actual orders
+    isHelpful: { type: Number, default: 0 }, // Helpful votes from other users
+    sellerResponse: {
+        message: String,
+        timestamp: Date
     }
+    
 }, {
     timestamps: true
 });
 
-// for better query performance
-reviewSchema.index({ sellerId: 1, type: 1, createdAt: -1 });
-reviewSchema.index({ menuItemId: 1, rating: -1 });
-reviewSchema.index({ customerId: 1, createdAt: -1 });
-reviewSchema.index({ orderId: 1 });
-
-// Ensure one review per customer per order per item/kitchen
-reviewSchema.index({ customerId: 1, orderId: 1, menuItemId: 1, type: 1 }, { unique: true });
+// Ensure one review per customer per order
+reviewSchema.index({ customerId: 1, orderId: 1 }, { unique: true });
 
 const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
 

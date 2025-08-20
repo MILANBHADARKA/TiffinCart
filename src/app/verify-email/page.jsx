@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { verifyEmailSchema } from '@/lib/validationSchemas';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
+import TifinLogo from '@/components/Logo/TifinLogo';
 
 function VerifyEmailPage() {
   const [isResending, setIsResending] = useState(false);
@@ -132,10 +133,8 @@ function VerifyEmailPage() {
             </button>
           </div>
 
-          <div className="mx-auto h-20 w-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mb-6">
-            <svg className="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
+          <div className="flex justify-center mb-6">
+            <TifinLogo size="xlarge" />
           </div>
           <h2 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Verify Your Email

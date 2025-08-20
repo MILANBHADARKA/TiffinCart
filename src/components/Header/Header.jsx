@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
+import TifinLogo from '../Logo/TifinLogo';
 
 function Header() {
   const { user, isAuthenticated, isLoading, logout } = useUser();
@@ -60,6 +61,7 @@ function Header() {
     <>
       <Link href="/" className="nav-link">Home</Link>
       <Link href="/seller/kitchens" className="nav-link">My Kitchens</Link>
+      <Link href="/seller/orders" className="nav-link">Orders</Link>
       <Link href="/seller/dashboard" className="nav-link">Dashboard</Link>
       <Link href="/seller/analytics" className="nav-link">Analytics</Link>
     </>
@@ -73,11 +75,7 @@ function Header() {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-            <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-              <svg className="h-4 w-4 sm:h-6 sm:w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
+            <TifinLogo size="medium" />
             <span className="text-lg sm:text-xl lg:text-2xl font-bold">
               <span className="text-orange-600">Tifin</span>
               <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>Cart</span>
@@ -322,6 +320,14 @@ function Header() {
                         >
                           <span className="text-xl mr-3">🏪</span>
                           <span className="font-medium">My Kitchens</span>
+                        </Link>
+                        <Link
+                          href="/seller/orders"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="mobile-nav-link flex items-center"
+                        >
+                          <span className="text-xl mr-3">📦</span>
+                          <span className="font-medium">Orders</span>
                         </Link>
                         <Link
                           href="/seller/dashboard"
