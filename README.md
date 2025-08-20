@@ -9,7 +9,7 @@
   [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
   [![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
   
-  [🔗 Live Demo](https://tifincart.vercel.app) • [📖 Documentation](#documentation) • [🐛 Report Bug](https://github.com/yourusername/tifincart/issues) • [✨ Request Feature](https://github.com/yourusername/tifincart/issues)
+  [🔗 Live Demo](#)• [🐛 Report Bug](https://github.com/milanbhadarka/tifincart/issues) • [✨ Request Feature](https://github.com/milanbhadarka/tifincart/issues)
 
 </div>
 
@@ -27,7 +27,6 @@ TifinCart is a modern, full-stack food delivery platform that bridges the gap be
 - 🔐 **Secure Authentication** - JWT-based auth with email verification
 - 📊 **Real-time Analytics** - Comprehensive dashboard for sellers
 - ⭐ **Review System** - Detailed feedback for items and kitchens
-- 🚚 **Smart Delivery** - Optimized delivery scheduling and tracking
 
 ---
 
@@ -39,17 +38,12 @@ TifinCart is a modern, full-stack food delivery platform that bridges the gap be
 - **Real-time Ordering** - Live order tracking with delivery windows
 - **Meal Planning** - Schedule breakfast, lunch, and dinner orders
 - **Review & Rating** - Rate individual items and overall kitchen experience
-- **Favorites & History** - Save favorite dishes and view order history
-- **Secure Payments** - Multiple payment options with order protection
 
 ### For Sellers 👨‍🍳
 - **Kitchen Management** - Complete profile and menu management
 - **Order Processing** - Real-time order notifications and status updates
 - **Analytics Dashboard** - Revenue tracking, popular items, and customer insights
 - **Delivery Settings** - Flexible delivery charges and service areas
-- **Inventory Control** - Manage item availability and stock
-- **Customer Communication** - Direct messaging and order notes
-- **Performance Metrics** - Detailed reports on sales and customer satisfaction
 
 ### Platform Features 🔧
 - **Email Notifications** - Automated order confirmations and updates
@@ -95,7 +89,7 @@ TifinCart is a modern, full-stack food delivery platform that bridges the gap be
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/tifincart.git
+   git clone https://github.com/milanbhadarka/tifincart.git
    cd tifincart
    ```
 
@@ -118,6 +112,8 @@ TifinCart is a modern, full-stack food delivery platform that bridges the gap be
    
    # JWT
    JWT_SECRET=your-super-secret-jwt-key
+
+   NODE_ENV=development
    
    # Cloudinary
    CLOUDINARY_CLOUD_NAME=your-cloud-name
@@ -141,7 +137,28 @@ TifinCart is a modern, full-stack food delivery platform that bridges the gap be
 5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
+
 ---
 
-## 📁 Project Structure
+## 🐛 Report Bug
+
+If you encounter any bugs or issues, please report them on the [GitHub Issues](https://github.com/milanbhadarka/tifincart/issues) page.
+
+---
+
+## ✨ Request Feature
+
+We welcome new feature suggestions! Please submit your ideas on the [GitHub Issues](https://github.com/milanbhadarka/tifincart/issues) page.
+
+---
+
+## 📫 Contact
+
+For any inquiries or feedback, please contact us at [work.bhadarka@gmail.com](mailto:work.bhadarka@gmail.com).
+
+---
+
+<div align="center">
+  <small>Made with ❤️ by Milan Bhadarka</small>
+</div>
 
