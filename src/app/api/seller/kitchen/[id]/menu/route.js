@@ -10,7 +10,8 @@ export async function GET(request, { params }) {
     try {
         await dbConnect();
 
-        const kitchenId = params.id;
+        // const kitchenId = await params.id;
+        const { id: kitchenId } = await params;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
@@ -75,14 +76,14 @@ export async function POST(request, { params }) {
     try {
         await dbConnect();
 
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
         if (!token) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "No token found" 
+                error: "Authentication required" 
             }), { status: 401 });
         }
 
@@ -111,49 +112,59 @@ export async function POST(request, { params }) {
         if (!kitchen) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "Kitchen not found or you don't have permission" 
+                error: "Kitchen not found or unauthorized" 
             }), { status: 404 });
         }
 
-        const itemData = await request.json();
-        itemData.kitchenId = kitchenId;
+        const {
+            name,
+            description,
+            price,
+            category,
+            isVeg,
+            spiciness,
+            ingredients,
+            image,
+            imagePublicId,
+            servingSize,
+            isAvailable
+            // REMOVED: deliveryCharge, freeDeliveryAbove, advanceOrderHours
+        } = await request.json();
 
-        // Extract delivery settings from the request
-        const { deliveryCharge, freeDeliveryAbove, ...menuItemData } = itemData;
-
-        // Update kitchen delivery settings if provided
-        if (deliveryCharge !== undefined || freeDeliveryAbove !== undefined) {
-            const updateData = {};
-            if (deliveryCharge !== undefined) {
-                updateData['deliveryInfo.deliveryCharge'] = parseFloat(deliveryCharge) || 30;
-            }
-            if (freeDeliveryAbove !== undefined) {
-                updateData['deliveryInfo.freeDeliveryAbove'] = freeDeliveryAbove ? parseFloat(freeDeliveryAbove) : null;
-            }
-            
-            await Kitchen.findByIdAndUpdate(kitchenId, updateData);
-        }
-
-        // Validate tiffin-specific data
-        if (!['Breakfast', 'Lunch', 'Dinner'].includes(menuItemData.category)) {
+        // Validation
+        if (!name || !description || !price || !category) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "Invalid category. Must be Breakfast, Lunch, or Dinner" 
+                error: "Name, description, price, and category are required" 
             }), { status: 400 });
         }
 
-        // Create new menu item
-        const menuItem = new MenuItem(menuItemData);
+        const menuItem = new MenuItem({
+            kitchenId,
+            name: name.trim(),
+            description: description.trim(),
+            price: parseFloat(price),
+            category,
+            isVeg: Boolean(isVeg),
+            spiciness: spiciness || 'medium',
+            ingredients: Array.isArray(ingredients) ? ingredients : [],
+            image: image || '',
+            imagePublicId: imagePublicId || '',
+            servingSize: servingSize || '1 person',
+            isAvailable: Boolean(isAvailable)
+            // REMOVED: deliveryInfo field
+        });
+
         await menuItem.save();
 
         return new Response(JSON.stringify({ 
             success: true, 
-            data: { item: menuItem },
-            message: "Tiffin item added successfully"
+            message: "Menu item added successfully",
+            data: { menuItem }
         }), { status: 201 });
 
     } catch (error) {
-        console.error("Error in kitchen menu POST route:", error);
+        console.error("Error adding menu item:", error);
         return new Response(JSON.stringify({ 
             success: false, 
             error: "Internal server error" 

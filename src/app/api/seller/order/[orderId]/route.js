@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
     try {
         await dbConnect();
 
-        const { orderId } = params;
+        const { orderId } = await params;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
@@ -79,7 +79,7 @@ export async function PATCH(request, { params }) {
     try {
         await dbConnect();
 
-        const { orderId } = params;
+        const { orderId } = await params;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 

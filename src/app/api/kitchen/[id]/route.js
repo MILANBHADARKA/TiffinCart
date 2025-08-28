@@ -6,7 +6,7 @@ export async function GET(request, { params }) {
     try {
         await dbConnect();
         
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
 
         // Find the kitchen - no auth required for viewing
         const kitchen = await Kitchen.findOne({ 

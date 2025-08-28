@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
     try {
         await dbConnect();
 
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 

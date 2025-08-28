@@ -38,11 +38,8 @@ function AddTiffinItem() {
       spiciness: 'medium',
       ingredients: '',
       isAvailable: true,
-      servingSize: '1 person',
-      advanceOrderHours: 3,
-      // Simplified delivery settings
-      deliveryCharge: 30,
-      freeDeliveryAbove: 500
+      servingSize: '1 person'
+      // REMOVED: advanceOrderHours, deliveryCharge, freeDeliveryAbove
     }
   });
 
@@ -128,9 +125,8 @@ function AddTiffinItem() {
       data.ingredients = [];
     }
     
-    // Ensure price and advanceOrderHours are numbers
+    // Ensure price is number
     data.price = parseFloat(data.price);
-    data.advanceOrderHours = parseInt(data.advanceOrderHours);
     
     // Add image data if uploaded
     if (uploadedImageUrl) {
@@ -451,45 +447,7 @@ function AddTiffinItem() {
                       </select>
                     </div>
                     
-                    {/* UPDATED: Simplified advance order section with explanation */}
-                    <div>
-                      <label htmlFor="advanceOrderHours" className={`block text-sm font-medium mb-1 ${
-                        theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-                      }`}>
-                        Preparation Time Needed (for your reference)
-                      </label>
-                      <select
-                        id="advanceOrderHours"
-                        {...register('advanceOrderHours')}
-                        className={`w-full px-4 py-2 border rounded-lg ${
-                          theme === 'dark' 
-                            ? 'border-gray-600 bg-gray-700 text-white' 
-                            : 'border-gray-300 bg-white text-gray-900'
-                        }`}
-                      >
-                        <option value={1}>1 hour preparation</option>
-                        <option value={2}>2 hours preparation</option>
-                        <option value={3}>3 hours preparation</option>
-                        <option value={6}>6 hours preparation</option>
-                        <option value={12}>Half day preparation</option>
-                        <option value={24}>Full day preparation</option>
-                      </select>
-                      <div className={`mt-2 p-3 rounded-lg ${
-                        theme === 'dark' ? 'bg-blue-900/20 border border-blue-600' : 'bg-blue-50 border border-blue-200'
-                      }`}>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-blue-300' : 'text-blue-800'}`}>
-                          <strong>Note:</strong> Customer orders are managed by fixed deadlines:
-                        </p>
-                        <ul className={`text-xs mt-1 space-y-1 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`}>
-                          <li>• Breakfast: Orders close at 8 PM (previous day)</li>
-                          <li>• Lunch: Orders close at 9 AM (same day)</li>
-                          <li>• Dinner: Orders close at 4 PM (same day)</li>
-                        </ul>
-                        <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`}>
-                          This setting helps you plan your preparation schedule.
-                        </p>
-                      </div>
-                    </div>
+                    {/* REMOVED: advanceOrderHours section since we use fixed deadlines */}
                   </div>
                 </div>
               </div>
@@ -599,12 +557,12 @@ function AddTiffinItem() {
                   </div>
                 </div>
                 
-                {/* Updated Tiffin Information */}
+                {/* Simplified Tiffin Information */}
                 <div className={`p-4 rounded-lg border ${
                   theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-orange-50 border-orange-200'
                 }`}>
                   <h3 className={`font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    📦 Tiffin Service Schedule
+                    📦 Tiffin Service Info
                   </h3>
                   <div className={`text-sm space-y-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                     <div className="grid grid-cols-1 gap-2">
@@ -625,90 +583,10 @@ function AddTiffinItem() {
                       theme === 'dark' ? 'border-gray-600' : 'border-orange-200'
                     }`}>
                       <p className="text-xs">
-                        • Eco-friendly packaging included<br/>
+                        • Delivery charges managed at kitchen level<br/>
                         • Fresh homemade preparation<br/>
                         • Fixed delivery windows for better planning
                       </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* NEW: Simplified Delivery Settings */}
-                <div>
-                  <h2 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    Delivery Settings
-                  </h2>
-                  
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="deliveryCharge" className={`block text-sm font-medium mb-1 ${
-                          theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-                        }`}>
-                          Delivery Charge (₹)*
-                        </label>
-                        <input
-                          id="deliveryCharge"
-                          type="number"
-                          min="0"
-                          step="1"
-                          {...register('deliveryCharge', { 
-                            required: 'Delivery charge is required',
-                            min: { value: 0, message: 'Charge must be positive' }
-                          })}
-                          className={`w-full px-4 py-2 border rounded-lg ${
-                            errors.deliveryCharge 
-                              ? 'border-red-500' 
-                              : theme === 'dark' 
-                                ? 'border-gray-600 bg-gray-700 text-white' 
-                                : 'border-gray-300 bg-white text-gray-900'
-                          }`}
-                          placeholder="30"
-                        />
-                        {errors.deliveryCharge && (
-                          <p className="mt-1 text-sm text-red-500">{errors.deliveryCharge.message}</p>
-                        )}
-                        <p className={`mt-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Fixed delivery fee for all orders
-                        </p>
-                      </div>
-
-                      <div>
-                        <label htmlFor="freeDeliveryAbove" className={`block text-sm font-medium mb-1 ${
-                          theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-                        }`}>
-                          Free Delivery Above (₹)
-                        </label>
-                        <input
-                          id="freeDeliveryAbove"
-                          type="number"
-                          min="0"
-                          step="1"
-                          {...register('freeDeliveryAbove')}
-                          className={`w-full px-4 py-2 border rounded-lg ${
-                            theme === 'dark' 
-                              ? 'border-gray-600 bg-gray-700 text-white' 
-                              : 'border-gray-300 bg-white text-gray-900'
-                          }`}
-                          placeholder="500"
-                        />
-                        <p className={`mt-1 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Orders above this amount get free delivery
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className={`p-3 rounded-lg ${
-                      theme === 'dark' ? 'bg-blue-900/20 border border-blue-600' : 'bg-blue-50 border border-blue-200'
-                    }`}>
-                      <h4 className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-800'}`}>
-                        💡 Delivery Fee Preview
-                      </h4>
-                      <div className={`text-xs space-y-1 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`}>
-                        <p>• Orders below ₹{watch('freeDeliveryAbove') || 500}: ₹{watch('deliveryCharge') || 30} delivery charge</p>
-                        <p>• Orders above ₹{watch('freeDeliveryAbove') || 500}: Free delivery</p>
-                        <p>• Example: Order ₹400 = ₹{watch('deliveryCharge') || 30} delivery | Order ₹600 = Free delivery</p>
-                      </div>
                     </div>
                   </div>
                 </div>

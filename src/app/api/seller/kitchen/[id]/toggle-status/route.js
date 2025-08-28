@@ -8,7 +8,7 @@ export async function PATCH(request, { params }) {
     try {
         await dbConnect();
 
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
@@ -36,6 +36,7 @@ export async function PATCH(request, { params }) {
         }
 
         const { isCurrentlyOpen } = await request.json();
+        console.log("Received isCurrentlyOpen:", isCurrentlyOpen);
         
         if (typeof isCurrentlyOpen !== 'boolean') {
             return new Response(JSON.stringify({ 

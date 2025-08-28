@@ -6,7 +6,6 @@ import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
 
-// GET cart contents
 export async function GET(request) {
     try {
         await dbConnect();
@@ -37,23 +36,104 @@ export async function GET(request) {
             }), { status: 403 });
         }
 
-        // Get or create cart
-        let cart = await Cart.findOne({ userId: user._id });
-        
-        if (!cart) {
-            cart = new Cart({ userId: user._id, items: [] });
-            await cart.save();
+        const cart = await Cart.findOne({ userId: user._id })
+            .populate({
+                path: 'items.menuItemId',
+                populate: {
+                    path: 'kitchenId',
+                    select: 'name deliveryInfo'
+                }
+            });
+
+        if (!cart || cart.items.length === 0) {
+            return new Response(JSON.stringify({ 
+                success: true, 
+                data: { 
+                    cart: {
+                        items: [],
+                        subtotal: 0,
+                        deliveryFee: 0,
+                        total: 0,
+                        kitchenDeliveries: []
+                    }
+                }
+            }), { status: 200 });
         }
 
-        // Calculate total
-        const total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        // Filter out items where menuItem or kitchen might be null
+        const validItems = cart.items.filter(item => 
+            item.menuItemId && 
+            item.menuItemId.kitchenId && 
+            item.menuItemId.kitchenId.deliveryInfo
+        );
+
+        if (validItems.length === 0) {
+            return new Response(JSON.stringify({ 
+                success: true, 
+                data: { 
+                    cart: {
+                        items: [],
+                        subtotal: 0,
+                        deliveryFee: 0,
+                        total: 0,
+                        kitchenDeliveries: []
+                    }
+                }
+            }), { status: 200 });
+        }
+
+        // Group items by kitchen to calculate delivery fees
+        const itemsByKitchen = {};
+        validItems.forEach(item => {
+            const kitchenId = item.menuItemId.kitchenId._id.toString();
+            if (!itemsByKitchen[kitchenId]) {
+                itemsByKitchen[kitchenId] = {
+                    kitchen: item.menuItemId.kitchenId,
+                    items: [],
+                    subtotal: 0
+                };
+            }
+            itemsByKitchen[kitchenId].items.push(item);
+            itemsByKitchen[kitchenId].subtotal += item.price * item.quantity;
+        });
+
+        // Calculate delivery fees per kitchen
+        let totalDeliveryFee = 0;
+        const kitchenDeliveries = [];
+
+        Object.values(itemsByKitchen).forEach(kitchenGroup => {
+            const { kitchen, subtotal } = kitchenGroup;
+            const deliveryInfo = kitchen.deliveryInfo || {};
+            
+            let deliveryFee = deliveryInfo.deliveryCharge || 0;
+            
+            // Check for free delivery
+            if (deliveryInfo.freeDeliveryAbove && subtotal >= deliveryInfo.freeDeliveryAbove) {
+                deliveryFee = 0;
+            }
+            
+            totalDeliveryFee += deliveryFee;
+            kitchenDeliveries.push({
+                kitchenId: kitchen._id,
+                kitchenName: kitchen.name,
+                subtotal,
+                deliveryFee,
+                minimumOrder: deliveryInfo.minimumOrder || 0
+            });
+        });
+
+        const subtotal = validItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const total = subtotal + totalDeliveryFee;
 
         return new Response(JSON.stringify({ 
             success: true, 
             data: { 
                 cart: {
-                    items: cart.items,
-                    total
+                    items: validItems,
+                    subtotal,
+                    deliveryFee: totalDeliveryFee,
+                    total,
+                    kitchenDeliveries
                 }
             }
         }), { status: 200 });
@@ -67,7 +147,6 @@ export async function GET(request) {
     }
 }
 
-// Add item to cart
 export async function POST(request) {
     try {
         await dbConnect();
@@ -98,7 +177,7 @@ export async function POST(request) {
             }), { status: 403 });
         }
 
-        const { menuItemId, quantity = 1 } = await request.json();
+        const { menuItemId, quantity = 1, clearCart = false } = await request.json();
 
         if (!menuItemId) {
             return new Response(JSON.stringify({ 
@@ -107,8 +186,10 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Check if the menu item exists and is available
-        const menuItem = await MenuItem.findById(menuItemId);
+        // Get menu item with kitchen info
+        const menuItem = await MenuItem.findById(menuItemId)
+            .populate('kitchenId', 'name deliveryInfo isCurrentlyOpen');
+
         if (!menuItem) {
             return new Response(JSON.stringify({ 
                 success: false, 
@@ -119,60 +200,74 @@ export async function POST(request) {
         if (!menuItem.isAvailable) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "This item is currently unavailable" 
+                error: "Menu item is not available" 
             }), { status: 400 });
         }
 
-        // Check if the kitchen is open
-        const kitchen = await Kitchen.findById(menuItem.kitchenId);
-        if (!kitchen || !kitchen.isCurrentlyOpen || kitchen.status !== 'approved') {
+        if (!menuItem.kitchenId.isCurrentlyOpen) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "The kitchen is currently closed or not available" 
+                error: "Kitchen is currently closed" 
             }), { status: 400 });
         }
 
-        // Get or create cart
+        // Find or create cart
         let cart = await Cart.findOne({ userId: user._id });
         
         if (!cart) {
-            cart = new Cart({ userId: user._id, items: [] });
+            cart = new Cart({ 
+                userId: user._id, 
+                items: []
+            });
         }
 
+        // Check if cart has items from different kitchen
+        if (cart.items.length > 0 && !clearCart) {
+            const existingKitchenId = cart.items[0].kitchenId.toString();
+            const newKitchenId = menuItem.kitchenId._id.toString();
+            
+            if (existingKitchenId !== newKitchenId) {
+                // Get the existing kitchen name for the response
+                const existingKitchen = await Kitchen.findById(existingKitchenId).select('name');
+                return new Response(JSON.stringify({ 
+                    success: false, 
+                    error: "DIFFERENT_KITCHEN",
+                    data: {
+                        existingKitchenName: existingKitchen?.name || 'Unknown Kitchen',
+                        newKitchenName: menuItem.kitchenId.name
+                    }
+                }), { status: 400 });
+            }
+        }
+
+        // If clearCart is true, clear existing items
+        if (clearCart) {
+            cart.items = [];
+        }
+        
         // Check if item already exists in cart
         const existingItemIndex = cart.items.findIndex(
             item => item.menuItemId.toString() === menuItemId
         );
-
-        if (existingItemIndex > -1) {
-            // Update quantity if item exists
+        
+        if (existingItemIndex >= 0) {
             cart.items[existingItemIndex].quantity += quantity;
         } else {
-            // Add new item if it doesn't exist
             cart.items.push({
                 menuItemId,
-                kitchenId: menuItem.kitchenId,
+                kitchenId: menuItem.kitchenId._id,
                 name: menuItem.name,
                 price: menuItem.price,
                 quantity,
-                image: menuItem.image,
                 isVeg: menuItem.isVeg
             });
         }
-
+        
         await cart.save();
-
-        // Calculate total
-        const total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
         return new Response(JSON.stringify({ 
             success: true, 
-            data: { 
-                cart: {
-                    items: cart.items,
-                    total
-                }
-            }
+            message: "Item added to cart"
         }), { status: 200 });
 
     } catch (error) {

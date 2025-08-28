@@ -58,6 +58,26 @@ function OrdersPage() {
     }
   };
 
+  const StarDisplay = ({ rating }) => {
+    if (!rating) return null;
+    
+    return (
+      <div className="flex items-center space-x-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`text-sm ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+          >
+            ⭐
+          </span>
+        ))}
+        <span className={`text-xs ml-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          ({rating}/5)
+        </span>
+      </div>
+    );
+  };
+
   const filteredOrders = selectedStatus === 'all'
     ? orders
     : orders.filter(order => order.status === selectedStatus);
@@ -155,14 +175,30 @@ function OrdersPage() {
                         <span className={`text-xs px-2 py-1 rounded-full ${ORDER_STATUS_COLORS[order.status]}`}>
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ')}
                         </span>
+                        {/* Display review stars if order is reviewed */}
+                        {order.isReviewed && order.review?.rating && (
+                          <div className="flex items-center">
+                            <StarDisplay rating={order.review.rating} />
+                          </div>
+                        )}
                       </div>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                         {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
                       </p>
                     </div>
-                    <div className="mt-2 sm:mt-0">
+                    <div className="mt-2 sm:mt-0 flex items-center space-x-3">
+                      {/* Show review status badge */}
+                      {order.status === 'delivered' && (
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          order.isReviewed 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {order.isReviewed ? '✓ Reviewed' : '⭐ Review Pending'}
+                        </span>
+                      )}
                       <Link
-                        href={`/orders/${order._id}`}
+                        href={`customer/orders/${order._id}`}
                         className="text-orange-500 hover:text-orange-600 text-sm font-medium"
                       >
                         View Details
@@ -173,7 +209,7 @@ function OrdersPage() {
 
                 <div className="p-6">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                    <div>
+                    <div className="flex-1">
                       <div className="mb-4">
                         <h4 className={`text-sm font-medium mb-2 ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
@@ -202,6 +238,22 @@ function OrdersPage() {
                           ))}
                         </ul>
                       </div>
+
+                      {/* Display review comment if available */}
+                      {order.isReviewed && order.review?.comment && (
+                        <div className="mt-4">
+                          <h4 className={`text-sm font-medium mb-2 ${
+                            theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                          }`}>
+                            Your Review
+                          </h4>
+                          <p className={`text-sm italic ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            "{order.review.comment}"
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-4 sm:mt-0 text-right">

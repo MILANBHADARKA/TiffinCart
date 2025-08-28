@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
-import KitchenReviews from '@/components/KitchenReviews'; // Import the KitchenReviews component
+import SimpleReview from '@/components/SimpleReview/SimpleReview';
 
 function KitchenDetailsPage() {
   const { id } = useParams();
@@ -21,6 +21,7 @@ function KitchenDetailsPage() {
   const [messageType, setMessageType] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showKitchenConfirm, setShowKitchenConfirm] = useState(null);
 
   useEffect(() => {
     fetchKitchenData();
@@ -73,7 +74,7 @@ function KitchenDetailsPage() {
     }
   };
 
-  const addToCart = async (menuItemId) => {
+  const addToCart = async (menuItemId, clearCart = false) => {
     if (!isAuthenticated) {
       router.push('/sign-in');
       return;
@@ -88,13 +89,13 @@ function KitchenDetailsPage() {
     try {
       setIsAddingToCart(prev => ({ ...prev, [menuItemId]: true }));
       setMessage('');
-
+      
       const response = await fetch('/api/customer/cart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ menuItemId, quantity: 1 }),
+        body: JSON.stringify({ menuItemId, quantity: 1, clearCart }),
         credentials: 'include'
       });
 
@@ -103,7 +104,14 @@ function KitchenDetailsPage() {
       if (result.success) {
         setMessage('Item added to cart!');
         setMessageType('success');
+        setShowKitchenConfirm(null);
         setTimeout(() => setMessage(''), 3000);
+      } else if (result.error === 'DIFFERENT_KITCHEN') {
+        setShowKitchenConfirm({
+          menuItemId,
+          existingKitchenName: result.data.existingKitchenName,
+          newKitchenName: result.data.newKitchenName
+        });
       } else {
         setMessage(result.error || 'Failed to add item to cart');
         setMessageType('error');
@@ -114,6 +122,14 @@ function KitchenDetailsPage() {
       setMessageType('error');
     } finally {
       setIsAddingToCart(prev => ({ ...prev, [menuItemId]: false }));
+    }
+  };
+
+  const handleKitchenConfirm = (confirmed) => {
+    if (confirmed && showKitchenConfirm) {
+      addToCart(showKitchenConfirm.menuItemId, true);
+    } else {
+      setShowKitchenConfirm(null);
     }
   };
 
@@ -251,6 +267,47 @@ function KitchenDetailsPage() {
     <div className={`min-h-screen transition-colors duration-300 pt-24 pb-12 ${
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
+      {/* Kitchen Confirmation Modal */}
+      {showKitchenConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className={`max-w-md w-full rounded-lg p-6 ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <div className="text-center">
+              <div className="text-4xl mb-4">⚠️</div>
+              <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Different Kitchen Detected
+              </h3>
+              <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                Your cart contains items from <span className="font-medium">{showKitchenConfirm.existingKitchenName}</span>. 
+                Adding items from <span className="font-medium">{showKitchenConfirm.newKitchenName}</span> will clear your current cart.
+              </p>
+              <p className={`text-xs mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                🍱 You can only order from one kitchen at a time for better delivery coordination.
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => handleKitchenConfirm(false)}
+                  className={`flex-1 px-4 py-2 rounded-lg border ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Keep Current Cart
+                </button>
+                <button
+                  onClick={() => handleKitchenConfirm(true)}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                >
+                  Clear & Add New
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Kitchen Header */}
         <div className={`mb-8 p-6 rounded-lg ${
@@ -278,11 +335,18 @@ function KitchenDetailsPage() {
                 <span className={`text-sm ml-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                   {kitchen.ratings.average.toFixed(1)} ({kitchen.ratings.totalReviews} reviews)
                 </span>
+                <button 
+                  onClick={() => document.getElementById('reviews-section').scrollIntoView({ behavior: 'smooth' })}
+                  className="ml-2 text-orange-600 hover:text-orange-700 text-sm underline"
+                >
+                  Read reviews
+                </button>
               </div>
               <p className={`mt-4 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 {kitchen.description}
               </p>
             </div>
+            
             <div className="mt-4 md:mt-0">
               <div className={`p-4 rounded-lg border ${
                 theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-orange-50 border-orange-200'
@@ -620,14 +684,26 @@ function KitchenDetailsPage() {
         )}
 
         {/* Kitchen Reviews Section */}
-        <div className={`mt-12 ${
-          theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-        } rounded-lg p-6`}>
-          <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            ⭐ Customer Reviews
-          </h3>
-          
-          <KitchenReviews kitchenId={id} theme={theme} />
+        <div 
+          id="reviews-section"
+          className={`mt-12 ${
+            theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+          } rounded-lg shadow-lg`}
+        >
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                ⭐ Customer Reviews & Ratings
+              </h3>
+              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                theme === 'dark' ? 'bg-orange-900 text-orange-300' : 'bg-orange-100 text-orange-800'
+              }`}>
+                {kitchen.ratings.average.toFixed(1)}/5 ★
+              </div>
+            </div>
+            
+            <SimpleReview kitchenId={id} theme={theme} />
+          </div>
         </div>
 
         {/* Updated Tiffin Service Information */}

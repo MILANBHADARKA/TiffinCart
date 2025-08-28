@@ -38,7 +38,7 @@ export async function GET(request, { params }) {
             }), { status: 403 });
         }
 
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
         const kitchen = await Kitchen.findById(kitchenId).populate('ownerId', 'name email');
 
         if (!kitchen) {
@@ -92,7 +92,7 @@ export async function PATCH(request, { params }) {
             }), { status: 403 });
         }
 
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
         const { status, adminRemarks } = await request.json();
 
         if (!status || !['approved', 'rejected', 'suspended'].includes(status)) {

@@ -8,7 +8,7 @@ export async function PATCH(request, { params }) {
     try {
         await dbConnect();
 
-        const orderId = params.id;
+        const orderId = await params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 

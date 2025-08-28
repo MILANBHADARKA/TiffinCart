@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
     try {
         await dbConnect();
 
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
@@ -74,7 +74,7 @@ export async function PUT(req, { params }) {
             return new Response(JSON.stringify({
                 success: false,
                 error: "No token found"
-            }), { status: 401 });
+        }, { status: 401 }));
         }
 
         const decoded = verifyToken(token.value);
@@ -82,7 +82,7 @@ export async function PUT(req, { params }) {
             return new Response(JSON.stringify({
                 success: false,
                 error: "Invalid token"
-            }), { status: 401 });
+        }, { status: 401 }));
         }
 
         const user = await User.findById(decoded.id);
@@ -91,10 +91,10 @@ export async function PUT(req, { params }) {
             return new Response(JSON.stringify({
                 success: false,
                 error: "Unauthorized access"
-            }), { status: 403 });
+        }, { status: 403 }));
         }
 
-        const { id } = params;
+        const { id } = await params;
 
         if (!id) {
             return new Response(JSON.stringify({
@@ -187,7 +187,7 @@ export async function PATCH(request, { params }) {
     try {
         await dbConnect();
 
-        const kitchenId = params.id;
+        const kitchenId = await params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
@@ -215,8 +215,10 @@ export async function PATCH(request, { params }) {
         }
 
         const updates = await request.json();
+
+        console.log("Received Updates:", updates);
         
-        // Fields that are allowed to be updated by seller
+        // Enhanced fields that are allowed to be updated by seller
         const allowedUpdates = [
             'name', 
             'description', 
@@ -225,7 +227,8 @@ export async function PATCH(request, { params }) {
             'contact',
             'isCurrentlyOpen',
             'deliveryInfo',
-            'images'
+            'images',
+            'address'
         ];
         
         // Filter out updates that aren't allowed
@@ -235,6 +238,8 @@ export async function PATCH(request, { params }) {
                 obj[key] = updates[key];
                 return obj;
             }, {});
+
+        console.log("Filtered Updates:", filteredUpdates);
         
         const kitchen = await Kitchen.findOneAndUpdate(
             { _id: kitchenId, ownerId: user._id },
@@ -251,6 +256,7 @@ export async function PATCH(request, { params }) {
 
         return new Response(JSON.stringify({ 
             success: true, 
+            message: "Kitchen updated successfully",
             data: { kitchen } 
         }), { status: 200 });
 

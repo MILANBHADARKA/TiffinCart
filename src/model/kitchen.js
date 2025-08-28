@@ -19,7 +19,6 @@ const kitchenSchema = new mongoose.Schema({
     cuisine: {
         type: String,
         required: true,
-        enum: ['indian', 'chinese', 'italian', 'continental', 'mexican', 'thai', 'japanese', 'korean', 'mediterranean']
     },
     address: {
         street: {
@@ -98,11 +97,10 @@ const kitchenSchema = new mongoose.Schema({
     },
     deliveryInfo: {
         minimumOrder: { type: Number, required: true, default: 100 },
-        estimatedDeliveryTime: { type: Number, required: true, default: 30 }, // in minutes
-        // Simplified delivery settings
-        deliveryCharge: { type: Number, required: true, default: 30 }, // Fixed delivery fee
-        freeDeliveryAbove: { type: Number, default: 500 }, // Free delivery above this amount
-        maxDeliveryDistance: { type: Number, default: 10 } // Service area limit in km
+        // estimatedDeliveryTime: { type: Number, required: true, default: 30 }, 
+        deliveryCharge: { type: Number, required: true, default: 30 }, 
+        freeDeliveryAbove: { type: Number, default: 500 },
+        maxDeliveryDistance: { type: Number, default: 10 } 
     },
     ratings: {
         average: {
@@ -142,18 +140,18 @@ const kitchenSchema = new mongoose.Schema({
             area: String,
             deliveryFee: { type: Number, default: 20 }
         }],
-        maxDeliveryDistance: { type: Number, default: 10 }, // in kilometers
+        maxDeliveryDistance: { type: Number, default: 10 }, 
         defaultDeliveryTimes: {
             breakfast: { 
-                orderCutoff: { type: String, default: '20:00' }, // Previous day 8 PM
+                orderCutoff: { type: String, default: '20:00' },
                 deliveryWindow: { type: String, default: '07:00-10:00' }
             },
             lunch: { 
-                orderCutoff: { type: String, default: '09:00' }, // Same day 9 AM
+                orderCutoff: { type: String, default: '09:00' },
                 deliveryWindow: { type: String, default: '12:00-15:00' }
             },
             dinner: { 
-                orderCutoff: { type: String, default: '16:00' }, // Same day 4 PM
+                orderCutoff: { type: String, default: '16:00' },
                 deliveryWindow: { type: String, default: '19:00-22:00' }
             }
         },

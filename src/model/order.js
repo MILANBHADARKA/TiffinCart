@@ -19,17 +19,7 @@ const orderItemSchema = new mongoose.Schema({
         required: true,
         min: 1
     },
-    isVeg: Boolean,
-    // Add review for individual items
-    review: {
-        rating: {
-            type: Number,
-            min: 1,
-            max: 5
-        },
-        comment: String,
-        timestamp: Date
-    }
+    isVeg: Boolean
 });
 
 const orderSchema = new mongoose.Schema({
@@ -95,27 +85,25 @@ const orderSchema = new mongoose.Schema({
         },
         note: String
     }],
-    // Kitchen-level review (overall experience)
-    kitchenReview: {
+    // Simple review - one per order
+    review: {
         rating: {
             type: Number,
             min: 1,
             max: 5
         },
-        comment: String,
-        timestamp: Date,
-        // Review categories
-        categories: {
-            foodQuality: { type: Number, min: 1, max: 5 },
-            packaging: { type: Number, min: 1, max: 5 },
-            deliveryTime: { type: Number, min: 1, max: 5 },
-            value: { type: Number, min: 1, max: 5 }
+        comment: {
+            type: String,
+            maxlength: 500
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
         }
     },
-    // Track if reviews are completed
-    reviewStatus: {
-        itemReviewsCompleted: { type: Boolean, default: false },
-        kitchenReviewCompleted: { type: Boolean, default: false }
+    isReviewed: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
@@ -125,7 +113,6 @@ const orderSchema = new mongoose.Schema({
 orderSchema.pre('save', function(next) {
     const order = this;
     
-    // If this is a new order or status has changed
     if (order.isNew || order.isModified('status')) {
         order.statusHistory.push({
             status: order.status,
