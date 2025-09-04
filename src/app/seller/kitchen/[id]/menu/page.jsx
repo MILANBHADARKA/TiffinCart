@@ -13,6 +13,8 @@ function MenuManagement() {
   
   const [kitchen, setKitchen] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
+  const [subscription, setSubscription] = useState(null);
+  const [limits, setLimits] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -30,6 +32,17 @@ function MenuManagement() {
     try {
       setLoading(true);
       setError('');
+
+      // Fetch current subscription
+      const subResponse = await fetch('/api/seller/subscription/current', {
+        credentials: 'include'
+      });
+      const subResult = await subResponse.json();
+      
+      if (subResult.success) {
+        setSubscription(subResult.data);
+        setLimits(subResult.data.limits);
+      }
 
       // Fetch kitchen details
       const kitchenResponse = await fetch(`/api/seller/kitchen/${id}`, {
@@ -243,7 +256,7 @@ function MenuManagement() {
             >
               Reviews
             </Link>
-            <Link
+            {/* <Link
               href={`/seller/kitchen/${id}/settings`}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
                 theme === 'dark'
@@ -252,25 +265,78 @@ function MenuManagement() {
               }`}
             >
               Settings
-            </Link>
+            </Link> */}
           </div>
         </div>
 
         {/* Menu Management */}
         <div className="mb-8">
+          {/* Subscription Status for Menu Items */}
+          {subscription && limits && (
+            <div className={`mb-6 p-4 rounded-lg border ${
+              theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+            }`}>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className={`text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Menu Item Usage
+                  </h3>
+                  <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {menuItems.length}/{limits.maxMenuItemsPerKitchen === -1 ? '∞' : limits.maxMenuItemsPerKitchen} items used
+                  </div>
+                </div>
+                {!subscription.hasSubscription && menuItems.length >= limits.maxMenuItemsPerKitchen && (
+                  <Link
+                    href="/seller/subscription"
+                    className="mt-2 sm:mt-0 bg-orange-500 text-white px-3 py-1 rounded text-xs font-medium hover:bg-orange-600"
+                  >
+                    Upgrade Plan
+                  </Link>
+                )}
+              </div>
+              
+              {/* Progress Bar */}
+              {limits.maxMenuItemsPerKitchen !== -1 && (
+                <div className="mt-3">
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div
+                      className="bg-orange-500 h-1.5 rounded-full"
+                      style={{ width: `${(menuItems.length / limits.maxMenuItemsPerKitchen) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
             <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
               Menu Items
             </h2>
-            <Link
-              href={`/seller/kitchen/${id}/menu/add`}
-              className="mt-4 sm:mt-0 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium flex items-center justify-center w-full sm:w-auto"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              Add New Menu Item
-            </Link>
+            
+            {limits && (limits.maxMenuItemsPerKitchen === -1 || menuItems.length < limits.maxMenuItemsPerKitchen) ? (
+              <Link
+                href={`/seller/kitchen/${id}/menu/add`}
+                className="mt-4 sm:mt-0 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium flex items-center justify-center w-full sm:w-auto"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add New Menu Item
+              </Link>
+            ) : (
+              <div className="mt-4 sm:mt-0 text-center">
+                <div className={`text-xs mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Item limit reached ({limits?.maxMenuItemsPerKitchen === -1 ? 'Unlimited' : limits?.maxMenuItemsPerKitchen})
+                </div>
+                <Link
+                  href="/seller/subscription"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded text-xs font-medium hover:from-orange-600 hover:to-red-600"
+                >
+                  Upgrade Plan
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Category Filter */}

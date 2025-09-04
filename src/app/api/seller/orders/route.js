@@ -1,6 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
 import User from "@/model/user";
 import Order from "@/model/order";
+import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
 

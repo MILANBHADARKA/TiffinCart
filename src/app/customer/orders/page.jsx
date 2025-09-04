@@ -30,6 +30,7 @@ function OrdersPage() {
     } else if (isAuthenticated && user?.role === 'customer') {
       fetchOrders();
     } else if (isAuthenticated && user?.role !== 'customer') {
+      console.log('Redirecting to home, user role:', user?.role);
       router.push('/');
     }
   }, [isAuthenticated, isLoading, user, router]);
@@ -198,7 +199,7 @@ function OrdersPage() {
                         </span>
                       )}
                       <Link
-                        href={`customer/orders/${order._id}`}
+                        href={`orders/${order._id}`}
                         className="text-orange-500 hover:text-orange-600 text-sm font-medium"
                       >
                         View Details

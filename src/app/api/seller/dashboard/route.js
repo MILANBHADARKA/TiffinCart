@@ -36,14 +36,24 @@ export async function GET(request) {
             }), { status: 403 });
         }
 
-        // Get today's date range
+        // Get date ranges
         const today = new Date();
         const startOfDay = new Date(today.setHours(0, 0, 0, 0));
         const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+        
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
 
         // Get seller's kitchens
         const kitchens = await Kitchen.find({ ownerId: user._id });
-        const activeKitchens = kitchens.filter(k => k.isCurrentlyOpen).length;
+        const kitchenIds = kitchens.map(k => k._id);
+        const totalKitchens = kitchens.length;
+        const activeKitchens = kitchens.filter(k => k.isCurrentlyOpen && k.status === 'approved').length;
+        const pendingApprovalKitchens = kitchens.filter(k => k.status === 'pending').length;
+
+        // All orders for this seller
+        const allOrders = await Order.find({ sellerId: user._id });
+        const totalOrders = allOrders.length;
 
         // Today's orders and revenue
         const todayOrders = await Order.find({
@@ -56,11 +66,35 @@ export async function GET(request) {
             revenue: todayOrders.reduce((sum, order) => sum + order.totalAmount, 0)
         };
 
-        // Pending orders (requiring action)
-        const pendingOrders = await Order.find({
+        // Monthly revenue
+        const monthlyOrders = await Order.find({
             sellerId: user._id,
-            status: { $in: ['pending', 'confirmed', 'preparing'] }
-        }).populate('customerId', 'name email').sort({ createdAt: -1 });
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+            status: { $ne: 'cancelled' }
+        });
+
+        const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+        // Order status counts
+        const pendingOrdersCount = await Order.countDocuments({
+            sellerId: user._id,
+            status: 'pending'
+        });
+
+        const preparingOrdersCount = await Order.countDocuments({
+            sellerId: user._id,
+            status: 'preparing'
+        });
+
+        const readyOrdersCount = await Order.countDocuments({
+            sellerId: user._id,
+            status: 'out_for_delivery'
+        });
+
+        const completedOrdersCount = await Order.countDocuments({
+            sellerId: user._id,
+            status: 'delivered'
+        });
 
         // Recent orders (last 10)
         const recentOrders = await Order.find({
@@ -68,44 +102,104 @@ export async function GET(request) {
         }).populate('customerId', 'name email')
           .populate('kitchenId', 'name')
           .sort({ createdAt: -1 })
-          .limit(10);
+          .limit(5);
+
+        // Pending orders (requiring immediate action)
+        const pendingOrders = await Order.find({
+            sellerId: user._id,
+            status: { $in: ['pending', 'confirmed', 'preparing'] }
+        }).populate('customerId', 'name email')
+          .populate('kitchenId', 'name')
+          .sort({ createdAt: -1 })
+          .limit(5);
+
+        // Kitchen performance
+        const kitchenPerformance = await Promise.all(
+            kitchens.map(async (kitchen) => {
+                const kitchenOrders = await Order.find({
+                    kitchenId: kitchen._id,
+                    createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+                });
+
+                const revenue = kitchenOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+                const avgRating = kitchen.ratings.average || 0;
+
+                return {
+                    kitchenId: kitchen._id,
+                    name: kitchen.name,
+                    orders: kitchenOrders.length,
+                    revenue,
+                    rating: avgRating,
+                    status: kitchen.status,
+                    isOpen: kitchen.isCurrentlyOpen
+                };
+            })
+        );
+
+        // Popular items across all kitchens
+        const menuItems = await MenuItem.find({ 
+            kitchenId: { $in: kitchenIds } 
+        }).populate('kitchenId', 'name');
+
+        // Calculate item popularity from orders
+        const itemOrderCounts = {};
+        allOrders.forEach(order => {
+            order.items.forEach(item => {
+                const itemId = item.menuItemId.toString();
+                itemOrderCounts[itemId] = (itemOrderCounts[itemId] || 0) + item.quantity;
+            });
+        });
+
+        const popularItems = menuItems
+            .map(item => ({
+                _id: item._id,
+                name: item.name,
+                kitchenName: item.kitchenId.name,
+                price: item.price,
+                category: item.category,
+                orderCount: itemOrderCounts[item._id.toString()] || 0,
+                isAvailable: item.isAvailable
+            }))
+            .sort((a, b) => b.orderCount - a.orderCount)
+            .slice(0, 5);
 
         // Urgent actions
         const urgentActions = [];
 
         // Check for orders pending confirmation
-        const pendingConfirmation = await Order.countDocuments({
-            sellerId: user._id,
-            status: 'pending'
-        });
-
-        if (pendingConfirmation > 0) {
+        if (pendingOrdersCount > 0) {
             urgentActions.push({
                 type: 'order',
-                title: `${pendingConfirmation} orders awaiting confirmation`,
+                title: `${pendingOrdersCount} orders awaiting confirmation`,
                 description: 'Review and confirm new orders to start preparation',
                 actionText: 'View Orders',
-                action: () => window.location.href = '/seller/orders?status=pending'
+                priority: 'high'
             });
         }
 
         // Check for orders ready for delivery
-        const readyForDelivery = await Order.countDocuments({
-            sellerId: user._id,
-            status: 'preparing'
-        });
-
-        if (readyForDelivery > 0) {
+        if (preparingOrdersCount > 0) {
             urgentActions.push({
                 type: 'order',
-                title: `${readyForDelivery} orders ready for delivery`,
-                description: 'Mark orders as out for delivery',
+                title: `${preparingOrdersCount} orders in preparation`,
+                description: 'Complete preparation and mark as ready for delivery',
                 actionText: 'Update Status',
-                action: () => window.location.href = '/seller/orders?status=preparing'
+                priority: 'medium'
             });
         }
 
-        // Check for low-rated items (if any reviews below 3 stars)
+        // Check for kitchens pending approval
+        if (pendingApprovalKitchens > 0) {
+            urgentActions.push({
+                type: 'approval',
+                title: `${pendingApprovalKitchens} kitchen(s) pending approval`,
+                description: 'Your kitchen submissions are under admin review',
+                actionText: 'Manage Kitchens',
+                priority: 'low'
+            });
+        }
+
+        // Check for low-rated kitchens
         const lowRatedKitchens = kitchens.filter(k => k.ratings.average < 3 && k.ratings.totalReviews > 0);
         if (lowRatedKitchens.length > 0) {
             urgentActions.push({
@@ -113,44 +207,64 @@ export async function GET(request) {
                 title: 'Low ratings detected',
                 description: `${lowRatedKitchens.length} kitchen(s) have ratings below 3 stars`,
                 actionText: 'Improve Quality',
-                action: () => window.location.href = '/seller/analytics'
+                priority: 'medium'
             });
         }
 
         // Check for inactive kitchens
-        const inactiveKitchens = kitchens.filter(k => !k.isCurrentlyOpen);
+        const inactiveKitchens = kitchens.filter(k => !k.isCurrentlyOpen && k.status === 'approved');
         if (inactiveKitchens.length > 0) {
             urgentActions.push({
                 type: 'info',
                 title: `${inactiveKitchens.length} kitchen(s) are closed`,
                 description: 'Consider opening kitchens to receive more orders',
                 actionText: 'Manage Kitchens',
-                action: () => window.location.href = '/seller/kitchens'
+                priority: 'low'
             });
         }
 
-        // Low stock warnings (mock data - you can implement actual inventory tracking)
-        const lowStockItems = await MenuItem.countDocuments({
-            kitchenId: { $in: kitchens.map(k => k._id) },
+        // Check for unavailable menu items
+        const unavailableItems = await MenuItem.countDocuments({
+            kitchenId: { $in: kitchenIds },
             isAvailable: false
         });
 
-        if (lowStockItems > 0) {
+        if (unavailableItems > 0) {
             urgentActions.push({
                 type: 'stock',
-                title: `${lowStockItems} items are unavailable`,
-                description: 'Update menu item availability',
+                title: `${unavailableItems} items are unavailable`,
+                description: 'Update menu item availability to increase sales',
                 actionText: 'Update Menu',
-                action: () => window.location.href = '/seller/kitchens'
+                priority: 'low'
             });
         }
 
+        // Business insights
+        const businessInsights = {
+            totalMenuItems: await MenuItem.countDocuments({ kitchenId: { $in: kitchenIds } }),
+            averageOrderValue: totalOrders > 0 ? (allOrders.reduce((sum, order) => sum + order.totalAmount, 0) / totalOrders) : 0,
+            topPerformingKitchen: kitchenPerformance.sort((a, b) => b.revenue - a.revenue)[0] || null,
+            thisWeekGrowth: await calculateWeeklyGrowth(user._id),
+            customerRetentionRate: await calculateCustomerRetention(user._id)
+        };
+
         const dashboardData = {
-            todayStats,
+            totalKitchens,
             activeKitchens,
-            pendingOrders,
+            pendingApprovalKitchens,
+            totalOrders,
+            monthlyRevenue,
+            pendingOrdersCount,
+            preparingOrdersCount,
+            readyOrdersCount,
+            completedOrdersCount,
             recentOrders,
-            urgentActions
+            pendingOrders,
+            kitchenPerformance,
+            popularItems,
+            urgentActions,
+            todayStats,
+            businessInsights
         };
 
         return new Response(JSON.stringify({ 
@@ -165,4 +279,48 @@ export async function GET(request) {
             error: "Internal server error" 
         }), { status: 500 });
     }
+}
+
+// Helper function to calculate weekly growth
+async function calculateWeeklyGrowth(sellerId) {
+    const now = new Date();
+    const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+    const thisWeekOrders = await Order.countDocuments({
+        sellerId,
+        createdAt: { $gte: lastWeek, $lt: now },
+        status: { $ne: 'cancelled' }
+    });
+
+    const lastWeekOrders = await Order.countDocuments({
+        sellerId,
+        createdAt: { $gte: twoWeeksAgo, $lt: lastWeek },
+        status: { $ne: 'cancelled' }
+    });
+
+    if (lastWeekOrders === 0) return thisWeekOrders > 0 ? 100 : 0;
+    return ((thisWeekOrders - lastWeekOrders) / lastWeekOrders) * 100;
+}
+
+// Helper function to calculate customer retention
+async function calculateCustomerRetention(sellerId) {
+    const orders = await Order.find({ 
+        sellerId,
+        status: 'delivered'
+    }).select('customerId createdAt');
+
+    const customerOrders = {};
+    orders.forEach(order => {
+        const customerId = order.customerId.toString();
+        if (!customerOrders[customerId]) {
+            customerOrders[customerId] = [];
+        }
+        customerOrders[customerId].push(order.createdAt);
+    });
+
+    const totalCustomers = Object.keys(customerOrders).length;
+    const returningCustomers = Object.values(customerOrders).filter(dates => dates.length > 1).length;
+
+    return totalCustomers > 0 ? (returningCustomers / totalCustomers) * 100 : 0;
 }

@@ -4,6 +4,7 @@ import Kitchen from "@/model/kitchen";
 import MenuItem from "@/model/menuItem";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
+import { checkMenuItemLimit } from "@/lib/subscriptionLimits";
 
 // GET all menu items for a kitchen
 export async function GET(request, { params }) {
@@ -76,14 +77,13 @@ export async function POST(request, { params }) {
     try {
         await dbConnect();
 
-        const kitchenId = await params.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('token');
 
         if (!token) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "Authentication required" 
+                error: "No token found" 
             }), { status: 401 });
         }
 
@@ -103,68 +103,66 @@ export async function POST(request, { params }) {
             }), { status: 403 });
         }
 
-        // Verify kitchen ownership
-        const kitchen = await Kitchen.findOne({ 
-            _id: kitchenId, 
-            ownerId: user._id 
-        });
+        const { id: kitchenId } = params;
 
-        if (!kitchen) {
+        // Verify kitchen ownership
+        const kitchen = await Kitchen.findById(kitchenId);
+        if (!kitchen || kitchen.ownerId.toString() !== user._id.toString()) {
             return new Response(JSON.stringify({ 
                 success: false, 
                 error: "Kitchen not found or unauthorized" 
             }), { status: 404 });
         }
 
-        const {
-            name,
-            description,
-            price,
-            category,
-            isVeg,
-            spiciness,
-            ingredients,
-            image,
-            imagePublicId,
-            servingSize,
-            isAvailable
-            // REMOVED: deliveryCharge, freeDeliveryAbove, advanceOrderHours
-        } = await request.json();
+        // Check menu item creation limits
+        const menuLimits = await checkMenuItemLimit(kitchenId);
+        if (!menuLimits.canCreate) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: `Menu item limit reached for this kitchen. You can add up to ${menuLimits.max} items per kitchen. Currently: ${menuLimits.current}/${menuLimits.max}. Please upgrade your subscription to add more items.`,
+                data: {
+                    current: menuLimits.current,
+                    max: menuLimits.max,
+                    upgradeRequired: true
+                }
+            }), { status: 403 });
+        }
 
-        // Validation
+        const menuItemData = await request.json();
+        
+        // Validate required fields
+        const { name, description, price, category } = menuItemData;
+        
         if (!name || !description || !price || !category) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                error: "Name, description, price, and category are required" 
+                error: "Missing required fields" 
             }), { status: 400 });
         }
 
         const menuItem = new MenuItem({
+            ...menuItemData,
             kitchenId,
-            name: name.trim(),
-            description: description.trim(),
-            price: parseFloat(price),
-            category,
-            isVeg: Boolean(isVeg),
-            spiciness: spiciness || 'medium',
-            ingredients: Array.isArray(ingredients) ? ingredients : [],
-            image: image || '',
-            imagePublicId: imagePublicId || '',
-            servingSize: servingSize || '1 person',
-            isAvailable: Boolean(isAvailable)
-            // REMOVED: deliveryInfo field
+            price: parseFloat(price)
         });
 
         await menuItem.save();
 
         return new Response(JSON.stringify({ 
             success: true, 
-            message: "Menu item added successfully",
-            data: { menuItem }
+            message: "Menu item created successfully",
+            data: { 
+                menuItem,
+                limits: {
+                    current: menuLimits.current + 1,
+                    max: menuLimits.max,
+                    remaining: menuLimits.remaining - 1
+                }
+            }
         }), { status: 201 });
 
     } catch (error) {
-        console.error("Error adding menu item:", error);
+        console.error("Error creating menu item:", error);
         return new Response(JSON.stringify({ 
             success: false, 
             error: "Internal server error" 

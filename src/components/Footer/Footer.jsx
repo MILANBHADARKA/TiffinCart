@@ -26,10 +26,9 @@ function Footer() {
       <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">For Customers</h3>
       <ul className="space-y-1 sm:space-y-2">
         <li><Link href="/kitchens" className={linkClass}>Browse Kitchens</Link></li>
-        <li><Link href="/orders" className={linkClass}>Order History</Link></li>
-        <li><Link href="/favorites" className={linkClass}>Saved Favorites</Link></li>
-        <li><Link href="/rewards" className={linkClass}>Rewards Program</Link></li>
-        <li><Link href="/help" className={linkClass}>Customer Support</Link></li>
+        <li><Link href="customer//orders" className={linkClass}>Order History</Link></li>
+        <li><Link href="/cart" className={linkClass}>My Cart</Link></li>
+        {/* <li><Link href="/help" className={linkClass}>Customer Support</Link></li> */}
       </ul>
     </div>
   );
@@ -39,10 +38,21 @@ function Footer() {
       <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">For Sellers</h3>
       <ul className="space-y-1 sm:space-y-2">
         <li><Link href="/seller/dashboard" className={linkClass}>Seller Dashboard</Link></li>
-        <li><Link href="/seller/register" className={linkClass}>Become a Seller</Link></li>
-        <li><Link href="/seller/resources" className={linkClass}>Seller Resources</Link></li>
-        <li><Link href="/seller/support" className={linkClass}>Seller Support</Link></li>
-        <li><Link href="/seller/guidelines" className={linkClass}>Guidelines</Link></li>
+        <li><Link href="/seller/kitchens" className={linkClass}>My Kitchens</Link></li>
+        <li><Link href="/seller/orders" className={linkClass}>Total Orders</Link></li>
+        <li><Link href="/seller/subscription" className={linkClass}>Subscription Plans</Link></li>
+        {/* <li><Link href="/seller/support" className={linkClass}>Seller Support</Link></li> */}
+      </ul>
+    </div>
+  );
+
+  const AdminLinks = () => (
+    <div>
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Admin Panel</h3>
+      <ul className="space-y-1 sm:space-y-2">
+        <li><Link href="/admin/kitchens" className={linkClass}>Manage Kitchens</Link></li>
+        <li><Link href="/admin/subscription/plans" className={linkClass}>Subscription Plans</Link></li>
+        <li><Link href="/admin/orders" className={linkClass}>Order Management</Link></li>
       </ul>
     </div>
   );
@@ -100,7 +110,9 @@ function Footer() {
 
           {/* Links */}
           {isAuthenticated && user ? (
-            user.role === 'customer' ? <CustomerLinks /> : <SellerLinks />
+            user.role === 'customer' ? <CustomerLinks /> : 
+            user.role === 'seller' ? <SellerLinks /> :
+            user.role === 'admin' ? <AdminLinks /> : null
           ) : (
             <>
               <CustomerLinks />
@@ -112,23 +124,10 @@ function Footer() {
           <div>
             <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Company</h3>
             <ul className="space-y-1 sm:space-y-2">
-              <li><Link href="/about" className={linkClass}>About Us</Link></li>
-              <li><Link href="/careers" className={linkClass}>Careers</Link></li>
-              <li><Link href="/blog" className={linkClass}>Blog</Link></li>
-              <li><Link href="/press" className={linkClass}>Press</Link></li>
-              <li><Link href="/contact" className={linkClass}>Contact Us</Link></li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Support & Legal</h3>
-            <ul className="space-y-1 sm:space-y-2">
-              <li><Link href="/help" className={linkClass}>Help Center</Link></li>
-              <li><Link href="/safety" className={linkClass}>Safety</Link></li>
-              <li><Link href="/terms" className={linkClass}>Terms of Service</Link></li>
-              <li><Link href="/privacy" className={linkClass}>Privacy Policy</Link></li>
-              <li><Link href="/cookies" className={linkClass}>Cookie Policy</Link></li>
+              <li><Link href="/" className={linkClass}>About Us</Link></li>
+              <li><Link href="/" className={linkClass}>Careers</Link></li>
+              <li><Link href="/" className={linkClass}>Blog</Link></li>
+              <li><Link href="/" className={linkClass}>Contact Us</Link></li>
             </ul>
           </div>
         </div>

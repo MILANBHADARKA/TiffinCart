@@ -33,7 +33,8 @@ const cartSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        unique: true
+        unique: true,
+        index: true
     },
     items: [cartItemSchema],
     updatedAt: {
@@ -42,6 +43,9 @@ const cartSchema = new mongoose.Schema({
     }
 });
 
+// Add compound index to ensure no duplicate carts per user
+cartSchema.index({ userId: 1 }, { unique: true });
+
 // Calculate cart total
 cartSchema.virtual('total').get(function() {
     return this.items.reduce((total, item) => {
@@ -49,8 +53,11 @@ cartSchema.virtual('total').get(function() {
     }, 0);
 });
 
-// Pre-save middleware to update the updatedAt field
+// Pre-save middleware to update the updatedAt field and validate userId
 cartSchema.pre('save', function(next) {
+    if (!this.userId) {
+        return next(new Error('userId is required for cart'));
+    }
     this.updatedAt = new Date();
     next();
 });

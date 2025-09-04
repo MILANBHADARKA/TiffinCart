@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -22,6 +22,10 @@ function AddTiffinItem() {
   const [imagePreview, setImagePreview] = useState('');
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const [uploadedImagePublicId, setUploadedImagePublicId] = useState('');
+  const [subscription, setSubscription] = useState(null);
+  const [kitchen, setKitchen] = useState(null);
+  const [menuItemCount, setMenuItemCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   
   const {
     register,
@@ -46,6 +50,57 @@ function AddTiffinItem() {
   const isVeg = watch('isVeg');
   const selectedCategory = watch('category');
   
+  useEffect(() => {
+    if (!isLoading && (!isAuthenticated || user?.role !== 'seller')) {
+      router.push('/sign-in');
+    } else if (isAuthenticated && user?.role === 'seller') {
+      fetchData();
+    }
+  }, [isAuthenticated, isLoading, user, router, kitchenId]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch subscription
+      const subResponse = await fetch('/api/seller/subscription/current', {
+        credentials: 'include'
+      });
+      const subResult = await subResponse.json();
+      
+      if (subResult.success) {
+        setSubscription(subResult.data);
+      }
+
+      // Fetch kitchen details
+      const kitchenResponse = await fetch(`/api/seller/kitchen/${kitchenId}`, {
+        credentials: 'include'
+      });
+      const kitchenResult = await kitchenResponse.json();
+      
+      if (kitchenResult.success) {
+        setKitchen(kitchenResult.data.kitchen);
+      }
+
+      // Fetch current menu items count
+      const menuResponse = await fetch(`/api/seller/kitchen/${kitchenId}/menu`, {
+        credentials: 'include'
+      });
+      const menuResult = await menuResponse.json();
+      
+      if (menuResult.success) {
+        setMenuItemCount(menuResult.data.items.length);
+      }
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setMessage('Failed to load data');
+      setMessageType('error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleImageSelect = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -187,7 +242,56 @@ function AddTiffinItem() {
     <div className={`min-h-screen transition-colors duration-300 pt-24 pb-12 ${
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Subscription Status */}
+        {subscription && subscription.limits && (
+          <div className={`mb-6 p-4 rounded-lg border ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className={`text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Menu Item Limit Status
+                </h3>
+                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {menuItemCount}/{subscription.limits.maxMenuItemsPerKitchen === -1 ? '∞' : subscription.limits.maxMenuItemsPerKitchen} items used for this kitchen
+                </p>
+                
+                {subscription.limits.maxMenuItemsPerKitchen !== -1 && menuItemCount >= subscription.limits.maxMenuItemsPerKitchen && (
+                  <p className="text-sm text-red-600 mt-1">
+                    ⚠️ You've reached the limit for menu items on the {subscription.hasSubscription ? subscription.currentPlan.name : 'Free'} plan.
+                  </p>
+                )}
+              </div>
+              
+              {!subscription.hasSubscription && menuItemCount >= subscription.limits.maxMenuItemsPerKitchen && subscription.limits.maxMenuItemsPerKitchen !== -1 && (
+                <Link
+                  href="/seller/subscription"
+                  className="bg-orange-500 text-white px-3 py-1 rounded text-sm hover:bg-orange-600"
+                >
+                  Upgrade Plan
+                </Link>
+              )}
+            </div>
+            
+            {/* Progress Bar */}
+            {subscription.limits.maxMenuItemsPerKitchen !== -1 && (
+              <div className="mt-3">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full ${
+                      menuItemCount >= subscription.limits.maxMenuItemsPerKitchen 
+                        ? 'bg-red-500' 
+                        : 'bg-orange-500'
+                    }`}
+                    style={{ width: `${Math.min((menuItemCount / subscription.limits.maxMenuItemsPerKitchen) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>

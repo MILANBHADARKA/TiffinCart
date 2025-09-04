@@ -174,15 +174,28 @@ export async function DELETE(request, { params }) {
             }), { status: 404 });
         }
 
-        const deletedItem = await MenuItem.findOneAndDelete({ 
-            _id: itemId, 
-            kitchenId 
-        });
+        // const deletedItem = await MenuItem.findOneAndDelete({ 
+        //     _id: itemId, 
+        //     kitchenId 
+        // });
 
+        // if (!deletedItem) {
+        //     return new Response(JSON.stringify({ 
+        //         success: false, 
+        //         error: "Menu item not found" 
+        //     }), { status: 404 });
+        // }
+        
+        //instead of deleting just remove kichenId to keep record of item
+        const deletedItem = await MenuItem.findOneAndUpdate(
+            { _id: itemId, kitchenId },
+            { $unset: { kitchenId: "" } },
+            { new: true }
+        );
         if (!deletedItem) {
-            return new Response(JSON.stringify({ 
-                success: false, 
-                error: "Menu item not found" 
+            return new Response(JSON.stringify({
+                success: false,
+                error: "Menu item not found"
             }), { status: 404 });
         }
 

@@ -39,7 +39,12 @@ export async function GET(request) {
 
         const query = {};
         if (status) {
-            query.status = status;
+            if(status == "all"){
+                //show all kitchens
+            }
+            else {
+                query.status = status;
+            }
         }
 
         const kitchens = await Kitchen.find(query)

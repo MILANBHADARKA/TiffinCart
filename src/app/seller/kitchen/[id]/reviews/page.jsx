@@ -143,7 +143,7 @@ function SellerKitchenReviewsPage() {
             </p>
           </div>
           <Link
-            href={`/seller/kitchen/${id}`}
+            href={`/seller/kitchen/${id}/dashboard`}
             className={`px-4 py-2 rounded-lg border ${
               theme === 'dark'
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'

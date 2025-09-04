@@ -236,7 +236,7 @@ function KitchenOrdersPage() {
             >
               Reviews
             </Link>
-            <Link
+            {/* <Link
               href={`/seller/kitchen/${id}/settings`}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
                 theme === 'dark'
@@ -245,7 +245,7 @@ function KitchenOrdersPage() {
               }`}
             >
               Settings
-            </Link>
+            </Link> */}
           </div>
         </div>
 

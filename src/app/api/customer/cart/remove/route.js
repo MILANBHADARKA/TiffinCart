@@ -43,6 +43,9 @@ export async function DELETE(request) {
             }), { status: 400 });
         }
 
+        // Clean up any invalid cart entries first
+        await Cart.deleteMany({ userId: null });
+
         // Find the cart
         const cart = await Cart.findOne({ userId: user._id });
         

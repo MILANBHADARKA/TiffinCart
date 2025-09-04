@@ -60,13 +60,27 @@ function Hero() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-lg mx-auto lg:mx-0">
                 {isAuthenticated ? (
                   <>
-                    <button className="cursor-pointer bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base lg:text-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-lg">
+                    <Link
+                      href="/kitchens"
+                      className="cursor-pointer bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base lg:text-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-lg text-center"
+                    >
                       Browse Meals 🍽️
-                    </button>
+                    </Link>
                     {user?.role === 'seller' && (
-                      <button className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base lg:text-lg hover:from-green-600 hover:to-blue-600 transition-all transform hover:scale-105 shadow-lg">
-                        Manage Kitchen 👨‍🍳
-                      </button>
+                      <Link
+                        href="/seller/subscription"
+                        className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base lg:text-lg hover:from-green-600 hover:to-blue-600 transition-all transform hover:scale-105 shadow-lg text-center"
+                      >
+                        Manage Plans 💎
+                      </Link>
+                    )}
+                    {user?.role === 'admin' && (
+                      <Link
+                        href="/admin/dashboard"
+                        className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base lg:text-lg hover:from-purple-600 hover:to-indigo-600 transition-all transform hover:scale-105 shadow-lg text-center"
+                      >
+                        Admin Panel 👑
+                      </Link>
                     )}
                   </>
                 ) : (

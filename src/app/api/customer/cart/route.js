@@ -211,6 +211,9 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
+        // Clean up any invalid cart entries first (carts with null userId)
+        await Cart.deleteMany({ userId: null });
+
         // Find or create cart
         let cart = await Cart.findOne({ userId: user._id });
         
@@ -227,7 +230,6 @@ export async function POST(request) {
             const newKitchenId = menuItem.kitchenId._id.toString();
             
             if (existingKitchenId !== newKitchenId) {
-                // Get the existing kitchen name for the response
                 const existingKitchen = await Kitchen.findById(existingKitchenId).select('name');
                 return new Response(JSON.stringify({ 
                     success: false, 
@@ -240,12 +242,11 @@ export async function POST(request) {
             }
         }
 
-        // If clearCart is true, clear existing items
         if (clearCart) {
             cart.items = [];
         }
         
-        // Check if item already exists in cart
+        // already exists in cart
         const existingItemIndex = cart.items.findIndex(
             item => item.menuItemId.toString() === menuItemId
         );
@@ -272,6 +273,21 @@ export async function POST(request) {
 
     } catch (error) {
         console.error("Error in cart POST route:", error);
+        
+        // Handle duplicate key error specifically
+        if (error.code === 11000 && error.keyPattern && error.keyPattern.userId) {
+            // Clean up invalid carts and retry
+            try {
+                await Cart.deleteMany({ userId: null });
+                return new Response(JSON.stringify({ 
+                    success: false, 
+                    error: "Cart conflict resolved. Please try again." 
+                }), { status: 409 });
+            } catch (cleanupError) {
+                console.error("Error cleaning up carts:", cleanupError);
+            }
+        }
+
         return new Response(JSON.stringify({ 
             success: false, 
             error: "Internal server error" 

@@ -61,15 +61,9 @@ export async function PATCH(request, { params }) {
 
         // Update order status
         order.status = status;
-        
-        // Add status history entry with note
-        order.statusHistory.push({
-            status: status,
-            timestamp: new Date(),
-            note: note || undefined
-        });
 
         await order.save();
+        // console.log("Order status updated:", order);
 
         return new Response(JSON.stringify({ 
             success: true, 

@@ -102,7 +102,7 @@ function KitchenDetailsPage() {
       const result = await response.json();
 
       if (result.success) {
-        setMessage('Item added to cart!');
+        setMessage('Item added to cart!'); 
         setMessageType('success');
         setShowKitchenConfirm(null);
         setTimeout(() => setMessage(''), 3000);

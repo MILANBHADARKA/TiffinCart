@@ -232,7 +232,7 @@ function KitchenDashboard() {
               >
                 Edit Kitchen
               </Link>
-              <Link
+              {/* <Link
                 href={`/seller/kitchen/${id}/preview`}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   theme === 'dark'
@@ -241,7 +241,7 @@ function KitchenDashboard() {
                 }`}
               >
                 View Customer View
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
@@ -289,7 +289,7 @@ function KitchenDashboard() {
             >
               Reviews
             </Link>
-            <Link
+            {/* <Link
               href={`/seller/kitchen/${id}/settings`}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap ${
                 theme === 'dark'
@@ -298,7 +298,7 @@ function KitchenDashboard() {
               }`}
             >
               Settings
-            </Link>
+            </Link> */}
           </div>
         </div>
 
@@ -346,7 +346,7 @@ function KitchenDashboard() {
           <h2 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Quick Actions
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
               href={`/seller/kitchen/${id}/menu/add`}
               className={`p-6 rounded-lg flex items-center ${
@@ -379,7 +379,7 @@ function KitchenDashboard() {
                 </p>
               </div>
             </Link>
-            <Link
+            {/* <Link
               href={`/seller/kitchen/${id}/settings`}
               className={`p-6 rounded-lg flex items-center ${
                 theme === 'dark' ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-50'
@@ -394,7 +394,7 @@ function KitchenDashboard() {
                   Update hours, delivery options, etc.
                 </p>
               </div>
-            </Link>
+            </Link> */}
           </div>
         </div>
 
@@ -445,7 +445,7 @@ function KitchenDashboard() {
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-900'
                       }`}>
                         <Link 
-                          href={`/seller/kitchen/${id}/orders/${order.orderId}`}
+                          href={`/seller/kitchen/${id}/orders/${order.id}`}
                           className="text-orange-500 hover:text-orange-600"
                         >
                           {order.id}

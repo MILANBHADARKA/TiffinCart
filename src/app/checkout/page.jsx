@@ -9,13 +9,13 @@ function CheckoutPage() {
   const { user, isAuthenticated, isLoading } = useUser();
   const { theme } = useTheme();
   const router = useRouter();
-  
+
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
 
@@ -33,13 +33,13 @@ function CheckoutPage() {
     try {
       setLoading(true);
       setError('');
-      
+
       const response = await fetch('/api/customer/cart', {
         credentials: 'include'
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         setCart(result.data.cart);
         if (!result.data.cart.items || result.data.cart.items.length === 0) {
@@ -58,7 +58,7 @@ function CheckoutPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!deliveryAddress.trim()) {
       setError('Please enter a delivery address');
       return;
@@ -69,7 +69,7 @@ function CheckoutPage() {
       const unmetRequirements = cart.kitchenDeliveries.filter(
         delivery => delivery.minimumOrder > 0 && delivery.subtotal < delivery.minimumOrder
       );
-      
+
       if (unmetRequirements.length > 0) {
         setError(`Minimum order value not met. Please add ₹${(unmetRequirements[0].minimumOrder - unmetRequirements[0].subtotal).toFixed(2)} more.`);
         return;
@@ -79,7 +79,7 @@ function CheckoutPage() {
     try {
       setSubmitting(true);
       setError('');
-      
+
       const response = await fetch('/api/customer/checkout', {
         method: 'POST',
         headers: {
@@ -93,7 +93,7 @@ function CheckoutPage() {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         setSuccess('Order placed successfully!');
         setTimeout(() => {
@@ -112,9 +112,8 @@ function CheckoutPage() {
 
   if (loading || isLoading) {
     return (
-      <div className={`min-h-screen pt-24 flex items-center justify-center ${
-        theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
-      }`}>
+      <div className={`min-h-screen pt-24 flex items-center justify-center ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+        }`}>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
       </div>
     );
@@ -122,9 +121,8 @@ function CheckoutPage() {
 
   if (!cart || !cart.items || cart.items.length === 0) {
     return (
-      <div className={`min-h-screen pt-24 flex items-center justify-center ${
-        theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
-      }`}>
+      <div className={`min-h-screen pt-24 flex items-center justify-center ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+        }`}>
         <div className="text-center">
           <div className="text-6xl mb-4">🛒</div>
           <h2 className={`text-2xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -145,14 +143,12 @@ function CheckoutPage() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 pt-24 pb-12 ${
-      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
-    }`}>
+    <div className={`min-h-screen transition-colors duration-300 pt-24 pb-12 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-bold ${
-            theme === 'dark' ? 'text-white' : 'text-gray-900'
-          }`}>
+          <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
             Checkout
           </h1>
           <p className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -183,20 +179,16 @@ function CheckoutPage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Checkout Form */}
           <div className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Delivery Address */}
-              <div className={`rounded-lg border p-6 ${
-                theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-              }`}>
+              <div className={`rounded-lg border p-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                }`}>
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   📍 Delivery Address
                 </h3>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${
-                    theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-                  }`}>
+                  <label className={`block text-sm font-medium mb-2 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                    }`}>
                     Complete Address *
                   </label>
                   <textarea
@@ -205,19 +197,16 @@ function CheckoutPage() {
                     placeholder="Enter your complete delivery address including house number, street, area, city, pincode..."
                     required
                     rows={4}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                      theme === 'dark' 
-                        ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${theme === 'dark'
+                        ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                         : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                    }`}
+                      }`}
                   />
                 </div>
               </div>
 
-              {/* Payment Method */}
-              <div className={`rounded-lg border p-6 ${
-                theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-              }`}>
+              <div className={`rounded-lg border p-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                }`}>
                 <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                   💳 Payment Method
                 </h3>
@@ -235,19 +224,29 @@ function CheckoutPage() {
                       💵 Cash on Delivery
                     </span>
                   </label>
-                  <label className="flex items-center">
+                  <div
+                    className={`flex items-center p-2 rounded-md border ${theme === "dark"
+                        ? "border-gray-600 bg-gray-700/40"
+                        : "border-gray-300 bg-gray-100"
+                      } opacity-70 cursor-not-allowed`}
+                  >
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="online"
-                      checked={paymentMethod === 'online'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300"
+                      disabled
+                      className="h-4 w-4 text-orange-500 border-gray-300"
                     />
-                    <span className={`ml-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    <span
+                      className={`ml-3 ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        } flex items-center`}
+                    >
                       🌐 Online Payment
+                      <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-orange-500 text-white rounded-full">
+                        Coming Soon
+                      </span>
                     </span>
-                  </label>
+                  </div>
                 </div>
               </div>
 
@@ -275,64 +274,104 @@ function CheckoutPage() {
           {/* Order Summary */}
           <div className="space-y-6">
             {/* Order Items */}
-            <div className={`rounded-lg border p-6 ${
-              theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            }`}>
+            <div className={`rounded-lg border p-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+              }`}>
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 🛒 Order Items ({cart.items.length})
               </h3>
-              <div className="space-y-3">
-                {cart.items.map((item) => {
-                  const kitchenName = item.menuItemId?.kitchenId?.name || 'Unknown Kitchen';
-                  return (
-                    <div key={item.menuItemId?._id || item.menuItemId} className="flex items-center space-x-3">
-                      <div className="h-12 w-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                        {item.menuItemId?.image ? (
-                          <img 
-                            src={item.menuItemId.image} 
-                            alt={item.name} 
-                            className="h-full w-full object-cover" 
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-orange-400 to-red-400">
-                            <span className="text-lg">🍲</span>
+              
+              {/* Group items by meal category for display */}
+              {(() => {
+                const itemsByCategory = cart.items.reduce((acc, item) => {
+                  const category = item.menuItemId?.category || 'Other';
+                  if (!acc[category]) acc[category] = [];
+                  acc[category].push(item);
+                  return acc;
+                }, {});
+
+                return Object.entries(itemsByCategory).map(([category, items]) => (
+                  <div key={category} className="mb-4">
+                    <h4 className={`text-sm font-medium mb-2 ${theme === 'dark' ? 'text-orange-300' : 'text-orange-600'}`}>
+                      {category} ({items.length} items)
+                    </h4>
+                    <div className="space-y-2 ml-4">
+                      {items.map((item) => {
+                        const kitchenName = item.menuItemId?.kitchenId?.name || 'Unknown Kitchen';
+                        return (
+                          <div key={item.menuItemId?._id || item.menuItemId} className="flex items-center space-x-3">
+                            <div className="h-10 w-10 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                              {item.menuItemId?.image ? (
+                                <img
+                                  src={item.menuItemId.image}
+                                  alt={item.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-orange-400 to-red-400">
+                                  <span className="text-sm">🍲</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <h5 className={`font-medium text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                {item.name}
+                              </h5>
+                              <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Qty: {item.quantity} × ₹{item.price.toFixed(2)}
+                              </p>
+                            </div>
+                            <div className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                              ₹{(item.price * item.quantity).toFixed(2)}
+                            </div>
                           </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className={`font-medium text-sm ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                          {item.name}
-                        </h4>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                          From: {kitchenName}
-                        </p>
-                        <p className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Qty: {item.quantity} × ₹{item.price.toFixed(2)}
-                        </p>
-                      </div>
-                      <div className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                        ₹{(item.price * item.quantity).toFixed(2)}
+                        );
+                      })}
+                    </div>
+                  </div>
+                ));
+              })()}
+              
+              {/* Separate Orders Notice */}
+              {(() => {
+                const categories = [...new Set(cart.items.map(item => item.menuItemId?.category))].filter(Boolean);
+                if (categories.length > 1) {
+                  return (
+                    <div className={`mt-4 p-3 rounded-lg border ${
+                      theme === 'dark' ? 'bg-blue-900/30 border-blue-600' : 'bg-blue-50 border-blue-200'
+                    }`}>
+                      <div className="flex items-start">
+                        <svg className="h-5 w-5 text-blue-500 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <h4 className={`text-sm font-medium ${theme === 'dark' ? 'text-blue-300' : 'text-blue-800'}`}>
+                            Separate Orders for Different Meals
+                          </h4>
+                          <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-700'}`}>
+                            Your {categories.join(', ')} items will be created as {categories.length} separate orders with different delivery times.
+                          </p>
+                        </div>
                       </div>
                     </div>
                   );
-                })}
-              </div>
+                }
+                return null;
+              })()}
             </div>
 
             {/* Pricing Breakdown */}
-            <div className={`rounded-lg border p-6 ${
-              theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            }`}>
+            <div className={`rounded-lg border p-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+              }`}>
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                 💰 Price Breakdown
               </h3>
-              
+
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Items Subtotal</span>
                   <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>₹{cart.subtotal?.toFixed(2) || '0.00'}</span>
                 </div>
-                
+
                 {/* Single Kitchen delivery info */}
                 {cart.kitchenDeliveries && cart.kitchenDeliveries.length > 0 && (
                   <div className="space-y-2">
@@ -347,12 +386,11 @@ function CheckoutPage() {
                           </span>
                         </div>
                         {delivery.minimumOrder > 0 && (
-                          <div className={`text-xs p-2 rounded ${
-                            delivery.subtotal >= delivery.minimumOrder 
-                              ? 'text-green-600 bg-green-50' 
+                          <div className={`text-xs p-2 rounded ${delivery.subtotal >= delivery.minimumOrder
+                              ? 'text-green-600 bg-green-50'
                               : 'text-red-600 bg-red-50'
-                          }`}>
-                            Minimum order: ₹{delivery.minimumOrder} 
+                            }`}>
+                            Minimum order: ₹{delivery.minimumOrder}
                             {delivery.subtotal >= delivery.minimumOrder ? ' ✅ Met' : ` ❌ (₹${(delivery.minimumOrder - delivery.subtotal).toFixed(2)} more needed)`}
                           </div>
                         )}
@@ -360,15 +398,14 @@ function CheckoutPage() {
                     ))}
                   </div>
                 )}
-                
+
                 <div className="flex justify-between">
                   <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>GST (5%)</span>
                   <span className={theme === 'dark' ? 'text-white' : 'text-gray-900'}>₹{((cart.subtotal || 0) * 0.05).toFixed(2)}</span>
                 </div>
-                
-                <div className={`flex justify-between text-lg font-semibold pt-3 border-t ${
-                  theme === 'dark' ? 'border-gray-600 text-white' : 'border-gray-200 text-gray-900'
-                }`}>
+
+                <div className={`flex justify-between text-lg font-semibold pt-3 border-t ${theme === 'dark' ? 'border-gray-600 text-white' : 'border-gray-200 text-gray-900'
+                  }`}>
                   <span>Total Amount</span>
                   <span className="text-orange-500">₹{((cart.total || 0) + ((cart.subtotal || 0) * 0.05)).toFixed(2)}</span>
                 </div>
@@ -376,17 +413,33 @@ function CheckoutPage() {
             </div>
 
             {/* Delivery Information */}
-            <div className={`rounded-lg border p-6 ${
-              theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            }`}>
+            <div className={`rounded-lg border p-6 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+              }`}>
               <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                🚚 Delivery Information
+                🚚 Delivery Schedule
               </h3>
-              <div className={`space-y-2 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                <p>• Fresh tiffin meals prepared on order</p>
-                <p>• Estimated delivery: 30-60 minutes based on meal timing</p>
-                <p>• Breakfast: 7-10 AM | Lunch: 12-3 PM | Dinner: 7-10 PM</p>
-                <p>• Contact kitchen directly for special instructions</p>
+              <div className={`space-y-3 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                {(() => {
+                  const categories = [...new Set(cart.items.map(item => item.menuItemId?.category))].filter(Boolean);
+                  const deliveryWindows = {
+                    'Breakfast': '7:00 AM - 10:00 AM',
+                    'Lunch': '12:00 PM - 3:00 PM',
+                    'Dinner': '7:00 PM - 10:00 PM'
+                  };
+                  
+                  return categories.map(category => (
+                    <div key={category} className={`p-3 rounded border ${
+                      theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                      <div className="font-medium">{category}: {deliveryWindows[category]}</div>
+                      <div className="text-xs mt-1">
+                        {category === 'Breakfast' && 'Delivered next day if ordered after 8 PM'}
+                        {category === 'Lunch' && 'Same day delivery if ordered before 9 AM'}
+                        {category === 'Dinner' && 'Same day delivery if ordered before 4 PM'}
+                      </div>
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           </div>

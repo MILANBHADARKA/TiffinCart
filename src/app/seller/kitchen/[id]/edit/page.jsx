@@ -197,7 +197,7 @@ function SellerKitchenEditPage() {
             </p>
           </div>
           <Link
-            href={`/seller/kitchen/${id}`}
+            href={`/seller/kitchen/${id}/dashboard`}
             className={`px-4 py-2 rounded-lg border ${theme === 'dark'
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
                 : 'border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -459,7 +459,7 @@ function SellerKitchenEditPage() {
           {/* Save Button */}
           <div className="flex justify-end space-x-3">
             <Link
-              href={`/seller/kitchen/${id}`}
+              href={`/seller/kitchen/${id}/dashboard`}
               className={`px-6 py-3 rounded-lg border font-medium ${theme === 'dark'
                   ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
                   : 'border-gray-300 text-gray-700 hover:bg-gray-50'

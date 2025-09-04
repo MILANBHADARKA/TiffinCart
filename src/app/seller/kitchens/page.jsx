@@ -10,6 +10,8 @@ function KitchensPage() {
   const { theme } = useTheme();
   const router = useRouter();
   const [kitchens, setKitchens] = useState([]);
+  const [subscription, setSubscription] = useState(null);
+  const [limits, setLimits] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -26,6 +28,18 @@ function KitchensPage() {
       setLoading(true);
       setError('');
 
+      // Fetch current subscription
+      const subResponse = await fetch('/api/seller/subscription/current', {
+        credentials: 'include'
+      });
+      const subResult = await subResponse.json();
+      
+      if (subResult.success) {
+        setSubscription(subResult.data);
+        setLimits(subResult.data.limits);
+      }
+
+      // Fetch kitchens
       const response = await fetch('/api/seller/kitchens', {
         credentials: 'include'
       });
@@ -108,17 +122,99 @@ function KitchensPage() {
   return (
     <div className={`min-h-screen transition-colors duration-300 pt-24 pb-12 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
-            <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>My Kitchens</h1>
-            <p className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Manage your kitchen listings and operations</p>
+        {/* Subscription Status */}
+        {subscription && limits && (
+          <div className={`mb-8 p-6 rounded-lg border ${
+            theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                  Subscription Status
+                </h2>
+                <div className="flex items-center space-x-4">
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    subscription.hasSubscription
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-orange-100 text-orange-800'
+                  }`}>
+                    {subscription.hasSubscription 
+                      ? `${subscription.currentPlan.name} Plan` 
+                      : 'Free Plan'
+                    }
+                  </div>
+                  <div className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Kitchens: {kitchens.length}/{limits.maxKitchens === -1 ? '∞' : limits.maxKitchens}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 md:mt-0">
+                {!subscription.hasSubscription && kitchens.length >= limits.maxKitchens && (
+                  <Link
+                    href="/seller/subscription"
+                    className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                  >
+                    Upgrade to Add More
+                  </Link>
+                )}
+              </div>
+            </div>
+            
+            {/* Progress Bar */}
+            {limits.maxKitchens !== -1 && (
+              <div className="mt-4">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    Kitchen Usage
+                  </span>
+                  <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                    {kitchens.length} / {limits.maxKitchens}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-orange-500 h-2 rounded-full"
+                    style={{ width: `${(kitchens.length / limits.maxKitchens) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
           </div>
-          <Link
-            href="/seller/kitchens/new"
-            className="mt-4 sm:mt-0 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105"
-          >
-            + Add New Kitchen
-          </Link>
+        )}
+
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8">
+          <div>
+            <h1 className={`text-2xl sm:text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+              My Kitchens
+            </h1>
+            <p className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              Manage your tiffin service kitchens
+            </p>
+          </div>
+          
+          {limits && (limits.maxKitchens === -1 || kitchens.length < limits.maxKitchens) ? (
+            <Link
+              href="/seller/kitchen/add"
+              className="mt-4 sm:mt-0 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium flex items-center"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Add New Kitchen
+            </Link>
+          ) : (
+            <div className="mt-4 sm:mt-0 text-center">
+              <div className={`text-sm mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Kitchen limit reached ({limits?.maxKitchens === -1 ? 'Unlimited' : limits?.maxKitchens})
+              </div>
+              <Link
+                href="/seller/subscription"
+                className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-lg hover:from-orange-600 hover:to-red-600 transition-colors text-sm font-medium"
+              >
+                Upgrade Plan
+              </Link>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -238,7 +334,7 @@ function KitchensPage() {
                     >
                       {kitchen.status === 'approved' ? 'Manage Kitchen' : 'Awaiting Approval'}
                     </Link>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                       <Link
                         href={`/seller/kitchen/${kitchen._id}/edit`}
                         className={`py-2 px-3 border rounded-lg text-center transition-colors text-sm font-medium ${
@@ -258,7 +354,7 @@ function KitchensPage() {
                       >
                         {kitchen.status === 'rejected' ? 'Reapply' : 'Edit'}
                       </Link>
-                      <button
+                      {/* <button
                         className={`py-2 px-3 border rounded-lg text-center transition-colors text-sm font-medium ${
                           theme === 'dark'
                             ? 'border-red-700 text-red-500 hover:bg-red-900 hover:text-red-400'
@@ -266,7 +362,7 @@ function KitchensPage() {
                         }`}
                       >
                         Delete
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>

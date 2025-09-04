@@ -63,45 +63,83 @@ export async function POST(request) {
             }), { status: 400 });
         }
 
-        // Group items by kitchen
-        const ordersByKitchen = {};
+        // Group items by kitchen AND meal category
+        const ordersByKitchenAndCategory = {};
         
         cart.items.forEach(item => {
             const kitchenId = item.menuItemId.kitchenId._id.toString();
-            if (!ordersByKitchen[kitchenId]) {
-                ordersByKitchen[kitchenId] = {
+            const category = item.menuItemId.category; // breakfast, lunch, dinner
+            const orderKey = `${kitchenId}_${category}`;
+            
+            if (!ordersByKitchenAndCategory[orderKey]) {
+                ordersByKitchenAndCategory[orderKey] = {
                     kitchen: item.menuItemId.kitchenId,
+                    category: category,
                     items: [],
                     subtotal: 0
                 };
             }
-            ordersByKitchen[kitchenId].items.push(item);
-            ordersByKitchen[kitchenId].subtotal += item.price * item.quantity;
+            ordersByKitchenAndCategory[orderKey].items.push(item);
+            ordersByKitchenAndCategory[orderKey].subtotal += item.price * item.quantity;
         });
 
         const createdOrders = [];
 
-        // Create separate orders for each kitchen
-        for (const [kitchenId, orderData] of Object.entries(ordersByKitchen)) {
-            const { kitchen, items, subtotal } = orderData;
+        // Create separate orders for each kitchen-category combination
+        for (const [orderKey, orderData] of Object.entries(ordersByKitchenAndCategory)) {
+            const { kitchen, category, items, subtotal } = orderData;
             const deliveryInfo = kitchen.deliveryInfo;
 
-            // Check minimum order value
-            if (deliveryInfo.minimumOrder && subtotal < deliveryInfo.minimumOrder) {
+            // Check minimum order value (apply per kitchen, not per meal)
+            const kitchenId = kitchen._id.toString();
+            const totalKitchenSubtotal = Object.entries(ordersByKitchenAndCategory)
+                .filter(([key]) => key.startsWith(`${kitchenId}_`))
+                .reduce((total, [, data]) => total + data.subtotal, 0);
+
+            if (deliveryInfo.minimumOrder && totalKitchenSubtotal < deliveryInfo.minimumOrder) {
                 return new Response(JSON.stringify({ 
                     success: false, 
-                    error: `Minimum order value for ${kitchen.name} is ₹${deliveryInfo.minimumOrder}. Current: ₹${subtotal}` 
+                    error: `Minimum order value for ${kitchen.name} is ₹${deliveryInfo.minimumOrder}. Current total: ₹${totalKitchenSubtotal}` 
                 }), { status: 400 });
             }
 
-            // Calculate delivery fee
+            // Calculate delivery fee (split among categories from same kitchen)
+            const categoriesFromKitchen = Object.keys(ordersByKitchenAndCategory)
+                .filter(key => key.startsWith(`${kitchenId}_`)).length;
+            
             let deliveryFee = deliveryInfo.deliveryCharge || 0;
-            if (deliveryInfo.freeDeliveryAbove && subtotal >= deliveryInfo.freeDeliveryAbove) {
+            if (deliveryInfo.freeDeliveryAbove && totalKitchenSubtotal >= deliveryInfo.freeDeliveryAbove) {
                 deliveryFee = 0;
             }
+            
+            // Split delivery fee among all categories from same kitchen
+            const splitDeliveryFee = Math.round(deliveryFee / categoriesFromKitchen);
 
             const tax = Math.round(subtotal * 0.05); // 5% tax
-            const totalAmount = subtotal + deliveryFee + tax; 
+            const totalAmount = subtotal + splitDeliveryFee + tax; 
+
+            // Set delivery date based on meal category
+            const now = new Date();
+            let deliveryDate = new Date(now);
+            
+            // For breakfast, if ordered after 8 PM, deliver next day
+            if (category === 'Breakfast' && now.getHours() >= 20) {
+                deliveryDate.setDate(deliveryDate.getDate() + 1);
+            }
+            
+            // Set delivery time windows
+            let deliveryTimeWindow = '';
+            switch(category) {
+                case 'Breakfast':
+                    deliveryTimeWindow = '7:00 AM - 10:00 AM';
+                    break;
+                case 'Lunch':
+                    deliveryTimeWindow = '12:00 PM - 3:00 PM';
+                    break;
+                case 'Dinner':
+                    deliveryTimeWindow = '7:00 PM - 10:00 PM';
+                    break;
+            }
 
             const order = new Order({
                 customerId: user._id,
@@ -117,9 +155,13 @@ export async function POST(request) {
                 deliveryAddress,
                 paymentMethod,
                 subtotal,
-                deliveryFee,
+                deliveryFee: splitDeliveryFee,
                 tax,
-                totalAmount
+                totalAmount,
+                mealCategory: category, // Add meal category to order
+                deliveryDate: deliveryDate,
+                deliveryTimeWindow: deliveryTimeWindow,
+                orderDeadlinePassed: false // Will be checked before preparation
             });
 
             await order.save();
@@ -131,8 +173,15 @@ export async function POST(request) {
 
         return new Response(JSON.stringify({ 
             success: true, 
-            message: "Orders placed successfully",
-            data: { orders: createdOrders }
+            message: `${createdOrders.length} order(s) placed successfully`,
+            data: { 
+                orders: createdOrders,
+                totalOrders: createdOrders.length,
+                ordersByCategory: createdOrders.reduce((acc, order) => {
+                    acc[order.mealCategory] = (acc[order.mealCategory] || 0) + 1;
+                    return acc;
+                }, {})
+            }
         }), { status: 200 });
 
     } catch (error) {

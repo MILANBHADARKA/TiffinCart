@@ -39,6 +39,19 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     items: [orderItemSchema],
+    mealCategory: {
+        type: String,
+        enum: ['Breakfast', 'Lunch', 'Dinner'],
+        required: true
+    },
+    deliveryDate: {
+        type: Date,
+        required: true
+    },
+    deliveryTimeWindow: {
+        type: String,
+        required: true
+    },
     deliveryAddress: {
         type: String,
         required: true
@@ -73,6 +86,10 @@ const orderSchema = new mongoose.Schema({
     totalAmount: {
         type: Number,
         required: true
+    },
+    orderDeadlinePassed: {
+        type: Boolean,
+        default: false
     },
     statusHistory: [{
         status: {
@@ -118,6 +135,11 @@ orderSchema.pre('save', function(next) {
             status: order.status,
             timestamp: new Date()
         });
+    }
+    if(order.status === 'delivered') {
+        order.paymentStatus = 'completed';
+    } else if(order.status === 'cancelled') {
+        order.paymentStatus = 'refunded';
     }
     
     next();
