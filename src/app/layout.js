@@ -3,6 +3,8 @@ import "./globals.css";
 import { UserProvider } from "@/context/User.context";
 import { ThemeProvider } from "@/context/Theme.context";
 import LayoutWrapper from "@/components/LayoutWrapper/LayoutWrapper";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +24,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <Analytics />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -32,6 +35,7 @@ export default function RootLayout({ children }) {
             </LayoutWrapper>
           </UserProvider>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
