@@ -34,7 +34,7 @@ export async function GET(request, { params }) {
             }), { status: 403 });
         }
 
-        const { id } = params;
+        const { id } = await params;
 
         const order = await Order.findById(id)
             .populate('customerId', 'name email phone address')

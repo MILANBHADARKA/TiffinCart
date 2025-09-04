@@ -103,7 +103,7 @@ export async function POST(request, { params }) {
             }), { status: 403 });
         }
 
-        const { id: kitchenId } = params;
+        const { id: kitchenId } = await params;
 
         // Verify kitchen ownership
         const kitchen = await Kitchen.findById(kitchenId);

@@ -35,7 +35,7 @@ export async function PUT(request, { params }) {
             }), { status: 403 });
         }
 
-        const { id } = params;
+        const { id } = await params;
         const updateData = await request.json();
 
         // Check if plan exists
@@ -113,7 +113,7 @@ export async function DELETE(request, { params }) {
             }), { status: 403 });
         }
 
-        const { id } = params;
+        const { id } = await params;
 
         // Check if plan exists
         const plan = await SubscriptionPlan.findById(id);
