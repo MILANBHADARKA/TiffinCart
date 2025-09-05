@@ -3,6 +3,7 @@ import User from "@/model/user";
 import Order from "@/model/order";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
+import { sendOrderDeliveredEmail } from "@/helper/orderDelivered";
 
 export async function PATCH(request, { params }) {
     try {
@@ -61,9 +62,33 @@ export async function PATCH(request, { params }) {
 
         // Update order status
         order.status = status;
-
         await order.save();
-        // console.log("Order status updated:", order);
+
+        // Send delivery confirmation email if order is delivered
+        if (status === 'delivered') {
+            try {
+                const orderWithPopulatedData = await Order.findById(order._id)
+                    .populate('customerId', 'name email')
+                    .populate('kitchenId', 'name')
+                    .populate('sellerId', 'name');
+
+                const emailData = await sendOrderDeliveredEmail({
+                    orderData: orderWithPopulatedData,
+                    customerDetails: {
+                        name: orderWithPopulatedData.customerId.name,
+                        email: orderWithPopulatedData.customerId.email
+                    },
+                    sellerDetails: {
+                        name: orderWithPopulatedData.sellerId.name
+                    }
+                });
+
+                // console.log('Order delivered email data:', emailData);
+            } catch (emailError) {
+                console.error('Error sending order delivered email:', emailError);
+                // Don't fail the status update if email fails
+            }
+        }
 
         return new Response(JSON.stringify({ 
             success: true, 

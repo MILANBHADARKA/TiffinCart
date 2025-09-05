@@ -217,6 +217,7 @@ function VerifyEmailPage({ email='' }) {
                   }`}
                   placeholder="000000"
                   autoComplete="one-time-code"
+                  autoFocus="true"
                   {...register('verifyCode', { required: 'Verification code is required' })}
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

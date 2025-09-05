@@ -4,6 +4,7 @@ import Order from "@/model/order";
 import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
+import { sendOrderDeliveredEmail } from "@/helper/orderDelivered";
 
 export async function GET(request) {
     try {
@@ -125,6 +126,30 @@ export async function PUT(request) {
         });
 
         await order.save();
+
+        // Send delivery confirmation email if order is delivered
+        if (status === 'delivered') {
+            try {
+                const orderWithPopulatedData = await Order.findById(order._id)
+                    .populate('customerId', 'name email')
+                    .populate('kitchenId', 'name')
+                    .populate('sellerId', 'name');
+
+                await sendOrderDeliveredEmail({
+                    orderData: orderWithPopulatedData,
+                    customerDetails: {
+                        name: orderWithPopulatedData.customerId.name,
+                        email: orderWithPopulatedData.customerId.email
+                    },
+                    sellerDetails: {
+                        name: orderWithPopulatedData.sellerId.name
+                    }
+                });
+            } catch (emailError) {
+                console.error('Error sending order delivered email:', emailError);
+                // Don't fail the status update if email fails
+            }
+        }
 
         return new Response(JSON.stringify({ 
             success: true, 

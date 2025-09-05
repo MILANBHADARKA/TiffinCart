@@ -6,6 +6,7 @@ import MenuItem from "@/model/menuItem";
 import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
+import { sendNewOrderEmail } from "@/helper/newOrder";
 
 export async function POST(request) {
     try {
@@ -165,6 +166,27 @@ export async function POST(request) {
 
             await order.save();
             createdOrders.push(order);
+
+            // Send new order email to seller
+            try {
+                const sellerDetails = await User.findById(kitchen.ownerId).select('name email');
+                const customerDetails = { name: user.name, email: user.email };
+
+                const emailData = await sendNewOrderEmail({
+                    orderData: {
+                        ...order.toObject(),
+                        kitchenId: kitchen
+                    },
+                    sellerDetails,
+                    customerDetails
+                });
+
+                // console.log('New order email data:', emailData);
+
+            } catch (emailError) {
+                console.error('Error sending new order email:', emailError);
+                // Don't fail the order if email fails
+            }
         }
 
         // Clear the cart

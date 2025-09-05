@@ -1,7 +1,7 @@
 import { resend } from "@/lib/resend";
 import VerificationEmail from "../../emails/VerificationEmail";
 
-export async function sendverificationEmail({ to, name, verifyCode }) {
+export async function sendverificationEmail({ to, name, verifyCode }) { 
     try {
         const { data, error } = await resend.emails.send({
             from: "TifinCart <tifincart.otp@themoneymate.xyz>",

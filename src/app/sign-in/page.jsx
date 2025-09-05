@@ -163,19 +163,6 @@ function SignInPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className={`ml-2 block text-xs sm:text-sm ${
-                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Remember me
-                </label>
-              </div>
               <Link href="/forgot-password" className="text-xs sm:text-sm text-orange-600 hover:text-orange-500 text-right">
                 Forgot password?
               </Link>
