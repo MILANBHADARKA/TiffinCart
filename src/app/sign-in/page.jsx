@@ -150,6 +150,7 @@ function SignInPage() {
                         : 'border-gray-300 bg-white text-gray-900'
                   }`}
                   placeholder="Enter your password"
+                  autoComplete='false'
                 />
                 <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
                   <svg className={`h-4 w-4 sm:h-5 sm:w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

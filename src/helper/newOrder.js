@@ -10,7 +10,7 @@ export async function sendNewOrderEmail({ orderData, sellerDetails, customerDeta
         const emailData = {
             sellerName: sellerDetails.name,
             customerName: customerDetails.name,
-            orderId: orderData._id,
+            orderId: orderData._id.toString(),
             kitchenName: orderData.kitchenId?.name || 'Unknown Kitchen',
             items: orderData.items,
             totalAmount: orderData.totalAmount,

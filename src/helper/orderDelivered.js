@@ -9,7 +9,7 @@ export async function sendOrderDeliveredEmail({ orderData, customerDetails, sell
 
         const emailData = {
             customerName: customerDetails.name,
-            orderId: orderData._id,
+            orderId: orderData._id.toString(),
             kitchenName: orderData.kitchenId?.name || 'Unknown Kitchen',
             items: orderData.items,
             totalAmount: orderData.totalAmount,

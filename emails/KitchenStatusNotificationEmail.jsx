@@ -232,9 +232,6 @@ export default function KitchenStatusNotificationEmail({
                   • 📋 Set up your menu items and pricing
                 </Text>
                 <Text style={{ color: '#065f46', fontSize: '14px', margin: '6px 0' }}>
-                  • ⏰ Configure your operating hours
-                </Text>
-                <Text style={{ color: '#065f46', fontSize: '14px', margin: '6px 0' }}>
                   • 🏪 Update your kitchen status to "Open" to start receiving orders
                 </Text>
                 <Text style={{ color: '#065f46', fontSize: '14px', margin: '6px 0' }}>

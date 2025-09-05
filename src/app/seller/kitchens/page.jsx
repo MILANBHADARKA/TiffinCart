@@ -234,7 +234,7 @@ function KitchensPage() {
             <h3 className="text-lg font-medium mb-2">No kitchens yet</h3>
             <p className="text-sm mb-6">Create your first kitchen to start selling delicious food!</p>
             <Link
-              href="/seller/kitchens/new"
+              href="/seller/kitchen/add"
               className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all"
             >
               Create First Kitchen

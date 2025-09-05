@@ -40,7 +40,7 @@ const userSchema = new Schema({
     },
     role: { 
         type: String, 
-        enum: ["customer", "seller"], 
+        enum: ["customer", "seller", "admin"], 
         required: true 
     },
     profilePicture: {
