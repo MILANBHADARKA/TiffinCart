@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from "@/context/User.context";
 import { ThemeProvider } from "@/context/Theme.context";
+import { CartProvider } from "@/context/Cart.context";
 import LayoutWrapper from "@/components/LayoutWrapper/LayoutWrapper";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -30,9 +31,11 @@ export default function RootLayout({ children }) {
       >
         <ThemeProvider>
           <UserProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
+            <CartProvider>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+            </CartProvider>
           </UserProvider>
         </ThemeProvider>
         <SpeedInsights />

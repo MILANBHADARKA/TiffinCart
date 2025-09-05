@@ -4,72 +4,40 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
+import { useCart } from '@/context/Cart.context';
 
 function CartPage() {
   const { user, isAuthenticated, isLoading } = useUser();
   const { theme } = useTheme();
+  const { cart, loading, updateQuantity, removeFromCart } = useCart();
   const router = useRouter();
   
-  const [cart, setCart] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState({});
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/sign-in');
-    } else if (isAuthenticated && user?.role === 'customer') {
-      fetchCart();
     } else if (isAuthenticated && user?.role !== 'customer') {
       router.push('/');
     }
   }, [isAuthenticated, isLoading, user, router]);
 
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      const response = await fetch('/api/customer/cart', {
-        credentials: 'include'
-      });
-
-      const result = await response.json();
-      
-      if (result.success) {
-        setCart(result.data.cart);
-      } else {
-        setError(result.error || 'Failed to fetch cart');
-      }
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateQuantity = async (itemId, newQuantity) => {
-    // if (newQuantity < 1) return;
+  const handleUpdateQuantity = async (itemId, change) => {
+    //check if item exists in cart
+    const currentItem = cart.items.find(item => 
+      (item.menuItemId?._id || item.menuItemId) === itemId
+    );
+    
+    if (!currentItem) return;
 
     try {
       setUpdating(prev => ({ ...prev, [itemId]: true }));
+      setError('');
 
-      const response = await fetch('/api/customer/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ menuItemId: itemId, quantity: newQuantity }),
-        credentials: 'include'
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Refresh cart data
-        await fetchCart();
-      } else {
+      const result = await updateQuantity(itemId, change);
+      
+      if (!result.success) {
         setError(result.error || 'Failed to update cart');
       }
     } catch (error) {
@@ -80,25 +48,14 @@ function CartPage() {
     }
   };
 
-  const removeItem = async (itemId) => {
+  const handleRemoveItem = async (itemId) => {
     try {
       setUpdating(prev => ({ ...prev, [itemId]: true }));
+      setError('');
 
-      const response = await fetch('/api/customer/cart/remove', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ itemId }),
-        credentials: 'include'
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Refresh cart data
-        await fetchCart();
-      } else {
+      const result = await removeFromCart(itemId);
+      
+      if (!result.success) {
         setError(result.error || 'Failed to remove item');
       }
     } catch (error) {
@@ -134,7 +91,7 @@ function CartPage() {
             <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Continue Shopping
+            Continue
           </Link>
         </div>
 
@@ -248,7 +205,7 @@ function CartPage() {
                                   <div className="flex items-center space-x-4 mt-4 sm:mt-0">
                                     <div className="flex items-center border rounded-md">
                                       <button 
-                                        onClick={() => updateQuantity(menuItemId, (-1))}
+                                        onClick={() => handleUpdateQuantity(menuItemId, -1)}
                                         disabled={updating[menuItemId] || item.quantity <= 1}
                                         className={`px-3 py-1 ${
                                           theme === 'dark' 
@@ -262,7 +219,7 @@ function CartPage() {
                                         {item.quantity}
                                       </span>
                                       <button 
-                                        onClick={() => updateQuantity(menuItemId, 1)}
+                                        onClick={() => handleUpdateQuantity(menuItemId, 1)}
                                         disabled={updating[menuItemId]}
                                         className={`px-3 py-1 ${
                                           theme === 'dark' 
@@ -274,7 +231,7 @@ function CartPage() {
                                       </button>
                                     </div>
                                     <button
-                                      onClick={() => removeItem(menuItemId)}
+                                      onClick={() => handleRemoveItem(menuItemId)}
                                       disabled={updating[menuItemId]}
                                       className="text-red-500 hover:text-red-700 p-1"
                                     >

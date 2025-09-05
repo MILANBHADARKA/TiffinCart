@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
+import { useCart } from '@/context/Cart.context';
 import SimpleReview from '@/components/SimpleReview/SimpleReview';
 
 function KitchenDetailsPage() {
@@ -11,6 +12,7 @@ function KitchenDetailsPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useUser();
   const { theme } = useTheme();
+  const { addToCart } = useCart();
 
   const [kitchen, setKitchen] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
@@ -74,7 +76,7 @@ function KitchenDetailsPage() {
     }
   };
 
-  const addToCart = async (menuItemId, clearCart = false) => {
+  const handleAddToCart = async (menuItemId, clearCart = false) => {
     if (!isAuthenticated) {
       router.push('/sign-in');
       return;
@@ -90,16 +92,7 @@ function KitchenDetailsPage() {
       setIsAddingToCart(prev => ({ ...prev, [menuItemId]: true }));
       setMessage('');
       
-      const response = await fetch('/api/customer/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ menuItemId, quantity: 1, clearCart }),
-        credentials: 'include'
-      });
-
-      const result = await response.json();
+      const result = await addToCart(menuItemId, 1, clearCart);
 
       if (result.success) {
         setMessage('Item added to cart!'); 
@@ -127,7 +120,7 @@ function KitchenDetailsPage() {
 
   const handleKitchenConfirm = (confirmed) => {
     if (confirmed && showKitchenConfirm) {
-      addToCart(showKitchenConfirm.menuItemId, true);
+      handleAddToCart(showKitchenConfirm.menuItemId, true);
     } else {
       setShowKitchenConfirm(null);
     }
@@ -633,7 +626,7 @@ function KitchenDetailsPage() {
                   </div>
 
                   <button
-                    onClick={() => addToCart(item._id)}
+                    onClick={() => handleAddToCart(item._id)}
                     disabled={isAddingToCart[item._id] || !canOrder}
                     className={`w-full py-2 rounded-lg text-sm font-medium transition-all ${
                       canOrder

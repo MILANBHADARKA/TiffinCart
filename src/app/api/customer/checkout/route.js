@@ -85,12 +85,12 @@ export async function POST(request) {
 
         const createdOrders = [];
 
-        // Create separate orders for each kitchen-category combination
+        // separate orders for each kitchen-category
         for (const [orderKey, orderData] of Object.entries(ordersByKitchenAndCategory)) {
             const { kitchen, category, items, subtotal } = orderData;
             const deliveryInfo = kitchen.deliveryInfo;
 
-            // Check minimum order value (apply per kitchen, not per meal)
+            // minimum order value
             const kitchenId = kitchen._id.toString();
             const totalKitchenSubtotal = Object.entries(ordersByKitchenAndCategory)
                 .filter(([key]) => key.startsWith(`${kitchenId}_`))
@@ -103,7 +103,7 @@ export async function POST(request) {
                 }), { status: 400 });
             }
 
-            // Calculate delivery fee (split among categories from same kitchen)
+            // Calculate delivery fee
             const categoriesFromKitchen = Object.keys(ordersByKitchenAndCategory)
                 .filter(key => key.startsWith(`${kitchenId}_`)).length;
             
@@ -112,8 +112,7 @@ export async function POST(request) {
                 deliveryFee = 0;
             }
             
-            // Split delivery fee among all categories from same kitchen
-            const splitDeliveryFee = Math.round(deliveryFee / categoriesFromKitchen);
+            const splitDeliveryFee = deliveryFee;
 
             const tax = Math.round(subtotal * 0.05); // 5% tax
             const totalAmount = subtotal + splitDeliveryFee + tax; 

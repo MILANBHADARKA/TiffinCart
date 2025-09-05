@@ -4,6 +4,7 @@ import Kitchen from "@/model/kitchen";
 import { verifyToken } from "@/lib/jwt";
 import { cookies } from 'next/headers';
 import { checkKitchenLimit } from "@/lib/subscriptionLimits";
+import { sendKitchenApprovalEmail } from "@/helper/sendAdminNotification";
 
 export async function POST(request) {
     try {
@@ -62,7 +63,7 @@ export async function POST(request) {
             deliveryInfo 
         } = kitchenData;
 
-        console.log('Received kitchen data:', kitchenData);
+        // console.log('Received kitchen data:', kitchenData);
 
         if (!name || !description || !cuisine || !address || !contact || !license?.fssaiNumber) {
             return new Response(JSON.stringify({
@@ -112,9 +113,14 @@ export async function POST(request) {
             status: 'pending' // Requires admin approval
         });
 
-        console.log('Creating kitchen with data:', kitchen);
-
+        // console.log('Creating kitchen with data:', kitchen);
         await kitchen.save();
+
+        // Send notification email to admin for approval
+        const emailResult = await sendKitchenApprovalEmail({kitchenData: kitchen, ownerDetails: { name: user.name, email: user.email }});
+        if (!emailResult.success) {
+            console.error('Failed to send kitchen approval email:', emailResult.error);
+        }
 
         return new Response(JSON.stringify({
             success: true,

@@ -23,10 +23,10 @@ function Footer() {
 
   const CustomerLinks = () => (
     <div>
-      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">For Customers</h3>
+      <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>For Customers</h3>
       <ul className="space-y-1 sm:space-y-2">
         <li><Link href="/kitchens" className={linkClass}>Browse Kitchens</Link></li>
-        <li><Link href="customer//orders" className={linkClass}>Order History</Link></li>
+        <li><Link href="/customer/orders" className={linkClass}>Order History</Link></li>
         <li><Link href="/cart" className={linkClass}>My Cart</Link></li>
         {/* <li><Link href="/help" className={linkClass}>Customer Support</Link></li> */}
       </ul>
@@ -35,7 +35,7 @@ function Footer() {
 
   const SellerLinks = () => (
     <div>
-      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">For Sellers</h3>
+      <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>For Sellers</h3>
       <ul className="space-y-1 sm:space-y-2">
         <li><Link href="/seller/dashboard" className={linkClass}>Seller Dashboard</Link></li>
         <li><Link href="/seller/kitchens" className={linkClass}>My Kitchens</Link></li>
@@ -48,7 +48,7 @@ function Footer() {
 
   const AdminLinks = () => (
     <div>
-      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Admin Panel</h3>
+      <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Admin Panel</h3>
       <ul className="space-y-1 sm:space-y-2">
         <li><Link href="/admin/kitchens" className={linkClass}>Manage Kitchens</Link></li>
         <li><Link href="/admin/subscription/plans" className={linkClass}>Subscription Plans</Link></li>
@@ -122,7 +122,7 @@ function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Company</h3>
+            <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Company</h3>
             <ul className="space-y-1 sm:space-y-2">
               <li><Link href="/" className={linkClass}>About Us</Link></li>
               <li><Link href="/" className={linkClass}>Careers</Link></li>

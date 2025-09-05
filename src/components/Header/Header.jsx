@@ -3,46 +3,19 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
+import { useCart } from '@/context/Cart.context';
 import TifinLogo from '../Logo/TifinLogo';
 import { useRouter } from "next/navigation";
 
 function Header() {
   const { user, isAuthenticated, isLoading, logout } = useUser();
   const { theme, toggleTheme } = useTheme();
+  const { getCartCount } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
   const [subscription, setSubscription] = useState(null);
   const router = useRouter();
 
-
-  // useEffect(() => {
-  //   if (isAuthenticated && user?.role === 'customer') {
-  //     fetchCartCount();
-  //   }
-  // }, [isAuthenticated, user]);
-
-  useEffect(() => {
-    const fetchCartCount = async () => {
-      try {
-        const response = await fetch('/api/customer/cart', {
-          credentials: 'include'
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          setCartCount(result.data.cart.items.length || 0);
-        }
-      } catch (error) {
-        console.error('Error fetching cart count:', error);
-      }
-    };
-
-
-    if (isAuthenticated && user?.role === 'customer') {
-      fetchCartCount();
-    }
-  }, [isAuthenticated, user]);
+  const cartCount = getCartCount();
 
   useEffect(() => {
     const fetchSellerSubscription = async () => {
@@ -69,7 +42,6 @@ function Header() {
   const handleLogout = async () => {
     const result = await logout();
     if (result.success) {
-      // window.location.reload();
       router.push("/sign-in");
     }
   };
@@ -79,7 +51,6 @@ function Header() {
       <Link href="/" className="nav-link">Home</Link>
       <Link href="/kitchens" className="nav-link">Kitchens</Link>
       <Link href="/customer/orders" className="nav-link">My Orders</Link>
-      {/* <Link href="/favorites" className="nav-link">Favorites</Link> */}
       <Link href="/cart" className="nav-link relative">
         Cart
         {cartCount > 0 && (
@@ -409,14 +380,6 @@ function Header() {
                           <span className="font-medium">Dashboard</span>
                         </Link>
                         <Link
-                          href="/seller/analytics"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="mobile-nav-link flex items-center"
-                        >
-                          <span className="text-xl mr-3">📈</span>
-                          <span className="font-medium">Analytics</span>
-                        </Link>
-                        <Link
                           href="/seller/subscription"
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="mobile-nav-link flex items-center justify-between"
@@ -517,17 +480,25 @@ function Header() {
       <style jsx>{`
         .nav-link {
           @apply font-medium transition-colors text-sm lg:text-base;
-          ${theme === 'dark'
-          ? 'color: rgb(209 213 219); hover:color: white;'
-          : 'color: rgb(55 65 81); hover:color: rgb(17 24 39);'
-        }
         }
         .mobile-nav-link {
           @apply px-4 py-3 font-medium transition-colors rounded-lg text-sm;
-          ${theme === 'dark'
-          ? 'color: rgb(209 213 219); hover:color: white; hover:background-color: rgb(55 65 81);'
-          : 'color: rgb(55 65 81); hover:color: rgb(17 24 39); hover:background-color: rgb(243 244 246);'
         }
+      `}</style>
+      {/* Add explicit text color classes for nav-link and mobile-nav-link */}
+      <style jsx global>{`
+        .nav-link {
+          color: ${theme === 'dark' ? '#d1d5db' : '#374151'};
+        }
+        .nav-link:hover {
+          color: ${theme === 'dark' ? '#fff' : '#111827'};
+        }
+        .mobile-nav-link {
+          color: ${theme === 'dark' ? '#d1d5db' : '#374151'};
+        }
+        .mobile-nav-link:hover {
+          color: ${theme === 'dark' ? '#fff' : '#111827'};
+          background-color: ${theme === 'dark' ? '#374151' : '#f3f4f6'};
         }
       `}</style>
     </header>

@@ -268,6 +268,9 @@ function SellerOrdersPage() {
                         <strong>Delivery:</strong> ₹{order.deliveryFee}
                       </p>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <strong>Tax:</strong> ₹{order.tax}
+                      </p>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                         <strong>Total:</strong> ₹{order.totalAmount}
                       </p>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>

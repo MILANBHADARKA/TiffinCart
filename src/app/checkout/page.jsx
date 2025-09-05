@@ -4,57 +4,29 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/User.context';
 import { useTheme } from '@/context/Theme.context';
+import { useCart } from '@/context/Cart.context';
 
 function CheckoutPage() {
   const { user, isAuthenticated, isLoading } = useUser();
   const { theme } = useTheme();
+  const { cart, loading, clearCart, fetchCart } = useCart();
   const router = useRouter();
 
-  const [cart, setCart] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/sign-in');
-    } else if (isAuthenticated && user?.role === 'customer') {
-      fetchCart();
     } else if (isAuthenticated && user?.role !== 'customer') {
       router.push('/');
+    } else if (isAuthenticated && (!cart.items || cart.items.length === 0)) {
+      router.push('/cart');
     }
-  }, [isAuthenticated, isLoading, user, router]);
-
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      setError('');
-
-      const response = await fetch('/api/customer/cart', {
-        credentials: 'include'
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setCart(result.data.cart);
-        if (!result.data.cart.items || result.data.cart.items.length === 0) {
-          router.push('/cart');
-        }
-      } else {
-        setError(result.error || 'Failed to fetch cart');
-      }
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isAuthenticated, isLoading, user, router, cart]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,9 +68,11 @@ function CheckoutPage() {
 
       if (result.success) {
         setSuccess('Order placed successfully!');
+        // Clear cart from context as well
+        await fetchCart();
         setTimeout(() => {
-          router.push('/orders');
-        }, 2000);
+          router.push('/customer/orders');
+        }, 1000);
       } else {
         setError(result.error || 'Failed to place order');
       }
