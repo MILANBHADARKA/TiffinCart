@@ -1,164 +1,153 @@
-<div align="center">
-  
-  # 🍱 TifinCart
-  
-  **Connecting food lovers with authentic homemade meals from local sellers**
-  
-  [![Next.js](https://img.shields.io/badge/Next.js-14.0+-black.svg?style=flat-square&logo=next.js)](https://nextjs.org/)
-  [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-  [![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
-  
-  [🔗 Live Demo](#)• [🐛 Report Bug](https://github.com/milanbhadarka/tifincart/issues) • [✨ Request Feature](https://github.com/milanbhadarka/tifincart/issues)
+# 🍱 TifinCart - Homemade Food Delivery Platform
 
-</div>
+> **Connecting food lovers with authentic homemade meals from local kitchen owners**
 
----
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Mongoose](https://img.shields.io/badge/Mongoose-8.0-green?style=for-the-badge&logo=mongoose)](https://mongoosejs.com/docs/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-blue?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![JWT](https://img.shields.io/badge/JWT-4.1-blue?style=for-the-badge&logo=jwt)](https://www.npmjs.com/package/jsonwebtoken)
+[![Razorpay](https://img.shields.io/badge/razorpay-2.9-blue?style=for-the-badge&logo=razorpay)](https://www.npmjs.com/package/jsonwebtoken)
+
 
 ## 🌟 Overview
 
-TifinCart is a modern, full-stack food delivery platform that bridges the gap between home chefs and food enthusiasts. Built with cutting-edge technologies, it provides a seamless experience for ordering authentic homemade meals while empowering local sellers to grow their culinary businesses.
+TifinCart is a comprehensivedaily tiffin ordering platform that bridges the gap between home chefs and food enthusiasts. The platform enables local kitchen owners to showcase their homemade meals while providing customers with access to authentic, fresh, and affordable tiffin services.
 
-### ✨ Key Highlights
+### 🎯 Key Objectives
+- **Empower Home Chefs**: Provide a platform for home cooks to monetize their culinary skills
+- **Fresh & Authentic**: Ensure customers get home-style, freshly prepared meals
+- **Community Building**: Foster local food communities and cultural exchange
+- **Sustainable Business**: Support local economies and reduce food waste
 
-- 🏠 **Authentic Homemade Food** - Fresh, traditional recipes from local home chefs
-- 📱 **Responsive Design** - Optimized for desktop, tablet, and mobile devices
-- 🌙 **Dark/Light Mode** - User-friendly theme switching
-- 🔐 **Secure Authentication** - JWT-based auth with email verification
-- 📊 **Real-time Analytics** - Comprehensive dashboard for sellers
-- ⭐ **Review System** - Detailed feedback for items and kitchens
+## ✨ Features
 
----
+### 👥 For Customers
+- **🔍 Smart Discovery**: Browse and search local kitchens by cuisine, location
+- **🛒 Shopping Cart**: Add items from kitchens with cart management
+- **📦 Order Tracking**: Real-time order status updates from preparation to delivery
+- **⭐ Reviews & Ratings**: Rate kitchens
+- **🔔 Email Notifications**: Order confirmations, delivery updates, and promotional content
 
-## 🚀 Features
+### 👨‍🍳 For Kitchen Owners (Sellers)
+- **🏪 Kitchen Management**: Create and manage multiple kitchen profiles
+- **📋 Menu Builder**: Add unlimited menu items with rich descriptions and images
+- **📊 Order Management**: Track incoming orders with status updates
+- **💰 Subscription Plans**: Flexible plans to unlock advanced features
+- **📈 Analytics Dashboard**: View earnings, order statistics, and performance metrics
+- **🚚 Delivery Settings**: Configure delivery radius, charges, and minimum orders
 
-### For Customers 👥
-- **Browse Local Kitchens** - Discover homemade food in your area
-- **Smart Filtering** - Filter by cuisine, dietary preferences, and ratings
-- **Real-time Ordering** - Live order tracking with delivery windows
-- **Meal Planning** - Schedule breakfast, lunch, and dinner orders
-- **Review & Rating** - Rate individual items and overall kitchen experience
+### 👑 For Admins
+- **🏢 Kitchen Approval**: Review and approve new kitchen applications
+- **💳 Subscription Control**: Create and manage subscription plans and pricing
+- **📊 System Analytics**: Comprehensive platform statistics and insights
+- **💰 Payment Oversight**: Track subscription payments and transaction history
 
-### For Sellers 👨‍🍳
-- **Kitchen Management** - Complete profile and menu management
-- **Order Processing** - Real-time order notifications and status updates
-- **Analytics Dashboard** - Revenue tracking, popular items, and customer insights
-- **Delivery Settings** - Flexible delivery charges and service areas
-
-### Platform Features 🔧
-- **Email Notifications** - Automated order confirmations and updates
-- **Image Upload** - Cloudinary integration for food photography
-- **Responsive UI** - Tailwind CSS with dark/light mode support
-- **SEO Optimized** - Next.js with proper meta tags and sitemap
-- **Error Handling** - Comprehensive error boundaries and user feedback
-- **Security** - Input validation, rate limiting, and data protection
-
----
-
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
 ### Frontend
-- **[Next.js 14](https://nextjs.org/)** - React framework with App Router
-- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
-- **[React Hook Form](https://react-hook-form.com/)** - Performant forms with validation
-- **[Zod](https://zod.dev/)** - TypeScript-first schema validation
+- **Framework**: Next.js
+- **UI Library**: React 18 with hooks and context
+- **Styling**: Tailwind CSS with custom components
+- **State Management**: React Context API
+- **Image Handling**: Cloudinary integration
+- **Responsive Design**: Mobile-first approach
 
 ### Backend
-- **[Node.js](https://nodejs.org/)** - JavaScript runtime
-- **[MongoDB](https://mongodb.com/)** - NoSQL database
-- **[Mongoose](https://mongoosejs.com/)** - MongoDB object modeling
-- **[JWT](https://jwt.io/)** - JSON Web Tokens for authentication
+- **Runtime**: Node.js
+- **API**: Next.js API Routes
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT with HTTP-only cookies
+- **File Upload**: Cloudinary for image storage
+- **Email Service**: Resend with React Email templates
 
-### Services & Tools
-- **[Cloudinary](https://cloudinary.com/)** - Image upload and optimization
-- **[Resend](https://resend.com/)** - Email delivery service
-- **[Vercel](https://vercel.com/)** - Deployment platform
-- **[bcryptjs](https://github.com/dcodeIO/bcrypt.js)** - Password hashing
+### Payment & Subscriptions
+- **Payment Gateway**: Razorpay integration
+- **Subscription Management**: Custom subscription system
+- **Webhook Handling**: Automated payment verification
 
----
+### DevOps & Tools
+- **Version Control**: Git & GitHub
+- **Package Manager**: npm
+- **Environment**: Node.js with dotenv
 
-## 📦 Installation
 
-### Prerequisites
-- Node.js 18.0 or higher
-- MongoDB database
-- Cloudinary account
-- Email service (Resend/SendGrid)
+### Subscription Features
+- **Limit Enforcement**: Real-time validation of subscription limits
+- **Usage Analytics**: Detailed breakdown of feature usage
 
-### Quick Start
+## 📧 Email Templates
 
-1. **Clone the repository**
+The system includes professional email templates for:
+
+### Transactional Emails
+- **Email Verification**: Account activation with OTP
+- **Password Reset**: Secure password reset with OTP
+- **Order Confirmations**: Detailed order summaries for customers
+- **Order Updates**: Status delivered notifications
+
+### Business Emails
+- **New Order Notifications**: Instant alerts to sellers
+- **Kitchen Approval**: Status updates for kitchen applications
+
+### Template Features
+- **Responsive Design**: Mobile-optimized layouts
+- **Brand Consistency**: TifinCart branding and colors
+- **Rich Content**: Order details, images, and tracking information
+- **Call-to-Actions**: Clear next steps and buttons
+
+
+## 🚀 Deployment
+
+### Production Deployment
+
+#### Using Vercel (Recommended)
+1. **Connect Repository**
    ```bash
-   git clone https://github.com/milanbhadarka/tifincart.git
-   cd tifincart
+   # Push to GitHub and connect to Vercel
+   git push origin main
    ```
 
-2. **Install dependencies**
+2. **Environment Variables**
+   - Add all production environment variables in Vercel dashboard
+   - Ensure database URLs point to production MongoDB
+
+3. **Custom Domain**
+   - Configure custom domain in Vercel settings
+   - Update NEXT_PUBLIC_BASE_URL accordingly
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### Getting Started
+1. **Fork the repository**
+2. **Create a feature branch**
    ```bash
-   npm install
-   # or
-   yarn install
+   git checkout -b feature/amazing-feature
    ```
-
-3. **Set up environment variables**
+3. **Make your changes**
+4. **Commit your changes**
    ```bash
-   cp .env.example .env.local
+   git commit -m "Add amazing feature"
    ```
-   
-   Fill in your environment variables:
-   ```env
-   # Database
-   MONGODB_URI=mongodb://localhost:27017/tifincart
-   
-   # JWT
-   JWT_SECRET=your-super-secret-jwt-key
-
-   NODE_ENV=development
-   
-   # Cloudinary
-   CLOUDINARY_CLOUD_NAME=your-cloud-name
-   CLOUDINARY_API_KEY=your-api-key
-   CLOUDINARY_API_SECRET=your-api-secret
-   
-   # Email Service
-   RESEND_API_KEY=your-resend-api-key
-   
-   # App URLs
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
-   ```
-
-4. **Start the development server**
+5. **Push to the branch**
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   git push origin feature/amazing-feature
    ```
+6. **Open a Pull Request**
 
-5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+### Contribution Guidelines
+- **Code Style**: Follow the existing code style and use Prettier
+- **Testing**: Add tests for new features
+- **Documentation**: Update documentation for any new features
+- **Commit Messages**: Use clear and descriptive commit messages
 
-
----
-
-## 🐛 Report Bug
-
-If you encounter any bugs or issues, please report them on the [GitHub Issues](https://github.com/milanbhadarka/tifincart/issues) page.
-
----
-
-## ✨ Request Feature
-
-We welcome new feature suggestions! Please submit your ideas on the [GitHub Issues](https://github.com/milanbhadarka/tifincart/issues) page.
-
----
-
-## 📫 Contact
-
-For any inquiries or feedback, please contact us at [work.bhadarka@gmail.com](mailto:work.bhadarka@gmail.com).
-
----
 
 <div align="center">
-  <small>Made with ❤️ by Milan Bhadarka</small>
+  <p>Made with ❤️ by the TifinCart Team</p>
+  <p>
+    <a href="https://tiffincart.vercel.app/">Website</a> • 
+    <a href="https://github.com/milanbhadarka/tiffincart/issues">Report Bug</a> •
+    <a href="https://github.com/milanbhadarka/tiffincart/issues">Request Feature</a>
+  </p>
 </div>
-
