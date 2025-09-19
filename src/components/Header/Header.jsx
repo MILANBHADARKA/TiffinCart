@@ -89,7 +89,7 @@ function Header() {
   );
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${theme === 'dark'
+    <header className={`fixed top-0 left-0 right-0 z-100 transition-colors duration-300 ${theme === 'dark'
       ? 'bg-gray-900/95 border-gray-700'
       : 'bg-white/95 border-gray-200'
       } backdrop-blur-sm border-b`}>
@@ -314,20 +314,12 @@ function Header() {
                           <span className="font-medium">Kitchens</span>
                         </Link>
                         <Link
-                          href="/orders"
+                          href="/customer/orders"
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="mobile-nav-link flex items-center"
                         >
                           <span className="text-xl mr-3">📦</span>
                           <span className="font-medium">My Orders</span>
-                        </Link>
-                        <Link
-                          href="/favorites"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="mobile-nav-link flex items-center"
-                        >
-                          <span className="text-xl mr-3">❤️</span>
-                          <span className="font-medium">Favorites</span>
                         </Link>
                         <Link
                           href="/cart"
@@ -445,19 +437,6 @@ function Header() {
 
               {isAuthenticated && user && (
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-                  <Link
-                    href="/profile"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`w-full flex items-center justify-center px-4 py-3 rounded-lg font-medium transition-colors text-sm border ${theme === 'dark'
-                      ? 'border-gray-600 text-gray-300 hover:bg-gray-800'
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    View Profile
-                  </Link>
                   <button
                     onClick={() => {
                       handleLogout();
