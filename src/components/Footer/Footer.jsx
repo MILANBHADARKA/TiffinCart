@@ -128,6 +128,10 @@ function Footer() {
               <li><Link href="/" className={linkClass}>Careers</Link></li>
               <li><Link href="/" className={linkClass}>Blog</Link></li>
               <li><Link href="/contact-us" className={linkClass}>Contact Us</Link></li>
+              <li><Link href="/cancellationsandrefunds" className={linkClass}>Cancellations & Refunds</Link></li>
+              <li><Link href="/privacypolicy" className={linkClass}>Privacy Policy</Link></li>
+              <li><Link href="/termandcondition" className={linkClass}>Term & Condition</Link></li>
+
             </ul>
           </div>
         </div>
