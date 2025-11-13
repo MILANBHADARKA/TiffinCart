@@ -127,7 +127,7 @@ function Footer() {
               <li><Link href="/" className={linkClass}>About Us</Link></li>
               <li><Link href="/" className={linkClass}>Careers</Link></li>
               <li><Link href="/" className={linkClass}>Blog</Link></li>
-              <li><Link href="/" className={linkClass}>Contact Us</Link></li>
+              <li><Link href="/contact-us" className={linkClass}>Contact Us</Link></li>
             </ul>
           </div>
         </div>

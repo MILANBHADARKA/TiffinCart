@@ -85,6 +85,7 @@ function Header() {
       <Link href="/admin/kitchens" className="nav-link">Manage Kitchens</Link>
       <Link href="/admin/subscription/plans" className="nav-link">Subscription Plans</Link>
       <Link href="/admin/orders" className="nav-link">All Orders</Link>
+      <Link href="/admin/contact" className="nav-link">Feedbacks</Link>
     </>
   );
 
